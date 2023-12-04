@@ -1,0 +1,21 @@
+[package]
+name = "near-hat"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { version = "1.0", features = ["backtrace"] }
+bollard = "0.13"
+futures = "0.3"
+once_cell = "1.18"
+serde = "1.0"
+serde_json = "1.0"
+tempfile = "3.8"
+testcontainers = { version = "0.15", features = ["experimental"] }
+toml = "0.8.1"
+tracing = "0.1"
+
+near-lake-framework = { git = "https://github.com/near/near-lake-framework-rs.git", branch = "main" }
+near-lake-primitives = { git = "https://github.com/near/near-lake-framework-rs.git", branch = "main" }
+near-primitives = "0.17"
+near-workspaces = "0.9.0"
