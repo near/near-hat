@@ -2758,13 +2758,17 @@ name = "near-hat"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bollard",
  "futures",
+ "near-crypto 0.17.0",
  "near-lake-framework",
  "near-lake-primitives",
  "near-primitives 0.17.0",
+ "near-token",
  "near-workspaces",
  "once_cell",
+ "rand 0.8.5",
  "serde",
  "serde_json",
  "tempfile",

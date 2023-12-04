@@ -1,0 +1,51 @@
+use crate::client::DockerClient;
+use crate::containers::lake_indexer::LakeIndexer;
+use crate::containers::localstack::LocalStack;
+use crate::validator::ValidatorContainer;
+use near_workspaces::network::{Sandbox, ValidatorKey};
+use near_workspaces::Worker;
+
+pub struct LakeIndexerCtx<'a> {
+    pub(crate) localstack: LocalStack<'a>,
+    pub(crate) lake_indexer: LakeIndexer<'a>,
+    // FIXME: Technically this network is not sandbox, but workspaces does not support plain localnet
+    pub(crate) worker: Worker<Sandbox>,
+}
+
+impl<'a> LakeIndexerCtx<'a> {
+    pub async fn new(
+        docker_client: &'a DockerClient,
+        network: &str,
+    ) -> anyhow::Result<LakeIndexerCtx<'a>> {
+        let s3_bucket = "near-lake-custom".to_string();
+        let s3_region = "us-east-1".to_string();
+        let localstack =
+            LocalStack::run(docker_client, network, s3_bucket.clone(), s3_region.clone()).await?;
+
+        let lake_indexer = LakeIndexer::run(
+            docker_client,
+            network,
+            &localstack.s3_address,
+            s3_bucket,
+            s3_region,
+        )
+        .await?;
+
+        let validator_key = lake_indexer.fetch_keys(docker_client).await?;
+
+        tracing::info!("initializing sandbox worker");
+        let worker = near_workspaces::sandbox()
+            .rpc_addr(&lake_indexer.host_rpc_address_ipv4())
+            .validator_key(ValidatorKey::Known(
+                validator_key.account_id.to_string().parse()?,
+                validator_key.secret_key.to_string().parse()?,
+            ))
+            .await?;
+
+        Ok(LakeIndexerCtx {
+            localstack,
+            lake_indexer,
+            worker,
+        })
+    }
+}

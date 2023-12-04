@@ -1,3 +1,4 @@
+use crate::validator::ValidatorContainer;
 use crate::DockerClient;
 use testcontainers::core::WaitFor;
 use testcontainers::{Container, GenericImage, RunnableImage};
@@ -78,5 +79,11 @@ impl<'a> LakeIndexer<'a> {
     pub fn host_rpc_address_ipv6(&self) -> String {
         let host_port = self.container.get_host_port_ipv6(Self::CONTAINER_RPC_PORT);
         format!("http://[::1]:{host_port}")
+    }
+}
+
+impl<'a> ValidatorContainer<'a> for LakeIndexer<'a> {
+    fn validator_container(&self) -> &Container<'a, GenericImage> {
+        &self.container
     }
 }
