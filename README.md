@@ -2,6 +2,11 @@
 
 Tooling suite for local development in NEAR ecosystem.
 
+To start:
+```
+$ RUST_LOG=info cargo run -p near-hat-cli -- start
+```
+
 Currently supports local versions of:
 * nearcore sandbox
 * NEAR Lake Indexer (+LocalStack S3)
