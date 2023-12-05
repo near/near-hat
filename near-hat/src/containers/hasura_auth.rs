@@ -17,7 +17,7 @@ impl<'a> HasuraAuth<'a> {
     ) -> anyhow::Result<HasuraAuth<'a>> {
         tracing::info!("starting Hasura Auth container");
 
-        let image = GenericImage::new("hasura/auth", "latest")
+        let image = GenericImage::new("darunrs/queryapi", "hasura_auth")
             .with_env_var("PORT", Self::CONTAINER_HASURA_AUTH_PORT.to_string())
             .with_env_var("DEFAULT_HASURA_ROLE", "append")
             .with_wait_for(WaitFor::message_on_stderr("starting HTTP server on port 4000"))
