@@ -84,9 +84,17 @@ impl DockerClient {
 
 impl Default for DockerClient {
     fn default() -> Self {
+        let socket = std::env::var("DOCKER_HOST")
+            .or(std::env::var("DOCKER_SOCK"))
+            .unwrap_or(
+                #[cfg(target_os = "macos")]
+                "unix://~/.docker/run/docker.sock".to_string(),
+                #[cfg(not(target_os = "macos"))]
+                "unix:///var/run/docker.sock".to_string(),
+            );
         Self {
             docker: Docker::connect_with_local(
-                "unix:///var/run/docker.sock",
+                &socket,
                 // 10 minutes timeout for all requests in case a lot of tests are being ran in parallel.
                 600,
                 bollard::API_DEFAULT_VERSION,
