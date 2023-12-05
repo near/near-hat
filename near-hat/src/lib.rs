@@ -3,7 +3,8 @@ mod containers;
 mod ctx;
 mod validator;
 
-use client::DockerClient;
+pub use client::DockerClient;
+
 use ctx::lake_indexer::LakeIndexerCtx;
 use ctx::nearcore::NearcoreCtx;
 use ctx::relayer::RelayerCtx;

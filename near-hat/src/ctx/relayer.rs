@@ -50,7 +50,7 @@ impl<'a> RelayerCtx<'a> {
             relayer_account.id(),
             &relayer_account_keys,
             creator_account.id(),
-            nearcore_ctx.social_db.id(),
+            &nearcore_ctx.social_db,
             social_account.id(),
             social_account.secret_key(),
         )

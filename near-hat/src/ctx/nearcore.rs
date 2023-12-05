@@ -1,10 +1,11 @@
+use near_lake_primitives::AccountId;
 use near_workspaces::network::Sandbox;
 use near_workspaces::types::{NearToken, SecretKey};
 use near_workspaces::{AccessKey, Account, Contract, Worker};
 
 pub struct NearcoreCtx {
     pub(crate) worker: Worker<Sandbox>,
-    pub(crate) social_db: Contract,
+    pub(crate) social_db: AccountId,
 }
 
 impl NearcoreCtx {
@@ -44,9 +45,11 @@ impl NearcoreCtx {
     }
 
     pub async fn new(worker: &Worker<Sandbox>) -> anyhow::Result<NearcoreCtx> {
-        Self::initialize_linkdrop(&worker).await?;
+        // FIXME: Initializing linkdrop and socialdb does not work as it requires an actual sandbox instance with patch_state
+        // Self::initialize_linkdrop(&worker).await?;
         // TODO: move out of nearcore trait into its own ctx
-        let social_db = Self::initialize_social_db(&worker).await?;
+        // let social_db = Self::initialize_social_db(&worker).await?;
+        let social_db = "social_db.near".parse()?;
 
         Ok(NearcoreCtx {
             worker: worker.clone(),

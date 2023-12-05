@@ -2778,6 +2778,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "near-hat-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap 4.4.10",
+ "near-hat",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "near-indexer-primitives"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

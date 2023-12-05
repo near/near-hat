@@ -6,10 +6,10 @@ use near_workspaces::network::{Sandbox, ValidatorKey};
 use near_workspaces::Worker;
 
 pub struct LakeIndexerCtx<'a> {
-    pub(crate) localstack: LocalStack<'a>,
-    pub(crate) lake_indexer: LakeIndexer<'a>,
+    pub localstack: LocalStack<'a>,
+    pub lake_indexer: LakeIndexer<'a>,
     // FIXME: Technically this network is not sandbox, but workspaces does not support plain localnet
-    pub(crate) worker: Worker<Sandbox>,
+    pub worker: Worker<Sandbox>,
 }
 
 impl<'a> LakeIndexerCtx<'a> {
