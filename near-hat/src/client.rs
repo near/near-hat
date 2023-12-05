@@ -4,6 +4,7 @@ use bollard::service::Ipam;
 use bollard::Docker;
 use futures::lock::Mutex;
 use once_cell::sync::Lazy;
+use std::path::Path;
 use testcontainers::clients::Cli;
 use testcontainers::{Container, Image};
 
@@ -86,12 +87,16 @@ impl Default for DockerClient {
     fn default() -> Self {
         let socket = std::env::var("DOCKER_HOST")
             .or(std::env::var("DOCKER_SOCK"))
-            .unwrap_or(
-                #[cfg(target_os = "macos")]
-                "unix://~/.docker/run/docker.sock".to_string(),
-                #[cfg(not(target_os = "macos"))]
-                "unix:///var/run/docker.sock".to_string(),
-            );
+            .unwrap_or_else(|_| {
+                let socket = Path::new("unix:///var/run/docker.sock");
+                if socket.exists() {
+                    socket.to_str().unwrap().to_string()
+                } else {
+                    let home =
+                        home::home_dir().expect("no home directory detected, please set HOME");
+                    format!("unix://{}/.docker/run/docker.sock", home.display())
+                }
+            });
         Self {
             docker: Docker::connect_with_local(
                 &socket,
