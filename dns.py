@@ -9,7 +9,6 @@ from mitmproxy.log import ALERT
 logger = logging.getLogger(__name__)
 
 def proxy_address(flow: http.HTTPFlow) -> tuple[str, int]:
-    # Poor man's loadbalancing: route every second domain through the alternative proxy.
     if flow.request.pretty_host == "lake.nearhat":
         return ("localhost", 55313)
     elif flow.request.pretty_host == "rpc.nearhat":
