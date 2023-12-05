@@ -5,3 +5,4 @@ pub mod localstack;
 pub mod redis;
 pub mod relayer;
 pub mod sandbox;
+pub mod hasura_auth;
