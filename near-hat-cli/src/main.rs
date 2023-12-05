@@ -41,6 +41,7 @@ async fn main() -> anyhow::Result<()> {
                 near_hat.lake_indexer_ctx.localstack.s3_bucket
             );
 
+            println!("\nPress any button to exit and destroy all containers...");
             while stdin().read(&mut [0]).await? == 0 {
                 tokio::time::sleep(std::time::Duration::from_millis(25)).await;
             }
