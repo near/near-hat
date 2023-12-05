@@ -1,5 +1,9 @@
 # NEAR Hat
 
+Prequirements 
+* Docker: `brew install --cask docker` OR `https://docs.docker.com/desktop/install/mac-install/` 
+* Rust: `brew install rust`
+
 Tooling suite for local development in NEAR ecosystem.
 
 To start:
