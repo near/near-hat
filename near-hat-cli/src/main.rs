@@ -45,6 +45,14 @@ async fn main() -> anyhow::Result<()> {
                 near_hat.queryapi_ctx.hasura_auth.host_address_ipv4()
             );
             println!(
+                "  Postgres: {}",
+                near_hat.queryapi_ctx.postgres.host_postgres_address_ipv4()
+            );
+            println!(
+                "  Hasura Graphql: {}",
+                near_hat.queryapi_ctx.hasura_graphql.host_address_ipv4()
+            );
+            println!(
                 "  Explorer Database: {}",
                 near_hat
                     .explorer_indexer_ctx
