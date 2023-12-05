@@ -88,9 +88,9 @@ impl Default for DockerClient {
         let socket = std::env::var("DOCKER_HOST")
             .or(std::env::var("DOCKER_SOCK"))
             .unwrap_or_else(|_| {
-                let socket = Path::new("unix:///var/run/docker.sock");
+                let socket = Path::new("/var/run/docker.sock");
                 if socket.exists() {
-                    socket.to_str().unwrap().to_string()
+                    "unix:///var/run/docker.sock".to_string()
                 } else {
                     let home =
                         home::home_dir().expect("no home directory detected, please set HOME");
