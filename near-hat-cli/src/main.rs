@@ -3,7 +3,7 @@ use near_hat::{DockerClient, NearHat};
 use tokio::io::{stdin, AsyncReadExt};
 use tracing_subscriber::EnvFilter;
 use std::env;
-
+use globalenv::unset_var;
 
 
 #[derive(Parser, Debug)]
@@ -35,6 +35,12 @@ async fn main() -> anyhow::Result<()> {
             while stdin().read(&mut [0]).await? == 0 {
                 tokio::time::sleep(std::time::Duration::from_millis(25)).await;
             }
+
+            env::vars()
+                .filter(|(key, _)| key.starts_with("NEARHAT"))
+                .for_each(|(key, _)| {
+                    let _ = unset_var(&key);
+                });
         }
     }
 
