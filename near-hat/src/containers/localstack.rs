@@ -75,6 +75,7 @@ impl<'a> LocalStack<'a> {
         set_var("NEARHAT_LAKE_S3_LOCAL", result.host_s3_address_ipv4().as_str()).unwrap();
         set_var("NEARHAT_LAKE_S3_BUCKET", &result.s3_bucket.as_str()).unwrap();
         set_var("NEARHAT_LAKE_S3_REGION", &result.s3_region.as_str()).unwrap();
+        set_var("NEARHAT_LAKE_S3_PORT", format!("{}", result.container.get_host_port_ipv4(Self::S3_CONTAINER_PORT)).as_str()).unwrap();
 
         Ok(result)
     }
