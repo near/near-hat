@@ -18,7 +18,7 @@ impl<'a> HasuraGraphql<'a> {
     ) -> anyhow::Result<HasuraGraphql<'a>> {
         tracing::info!("starting Hasura Graphql container");
 
-        let image = GenericImage::new("hasura/graphql-engine", "latest")
+        let image = GenericImage::new("darunrs/queryapi", "hasura_graphql_engine")
             .with_env_var("HASURA_GRAPHQL_DATABASE_URL", postgres_address)
             .with_env_var("HASURA_GRAPHQL_ENABLE_CONSOLE", "true")
             .with_env_var("HASURA_GRAPHQL_DEV_MODE", "true")

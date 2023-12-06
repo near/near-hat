@@ -16,7 +16,7 @@ impl<'a> Postgres<'a> {
     ) -> anyhow::Result<Postgres<'a>> {
         tracing::info!(network, "starting Postgres container");
 
-        let image = GenericImage::new("postgres", "12")
+        let image = GenericImage::new("darunrs/queryapi", "postgres")
             .with_env_var("POSTGRES_USER", "postgres")
             .with_env_var("POSTGRES_PASSWORD", "postgres")
             .with_exposed_port(Self::POSTGRES_PORT)
