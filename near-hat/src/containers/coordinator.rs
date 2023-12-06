@@ -33,8 +33,7 @@ impl<'a> Coordinator<'a> {
             .with_env_var("REDIS_CONNECTION_STRING", redis_address)
             .with_env_var("PORT", Self::METRICS_PORT.to_string())
             .with_env_var("REGISTRY_CONTRACT_ID", "dev-queryapi.dataplatform.near")
-            .with_exposed_port(Self::METRICS_PORT);
-            // .with_wait_for(WaitFor::message_on_stdout("Starting queryapi_coordinator..."));
+            .with_wait_for(WaitFor::message_on_stdout("Starting queryapi_coordinator..."));
 
         let image: RunnableImage<GenericImage> = (
             image,
@@ -52,7 +51,7 @@ impl<'a> Coordinator<'a> {
             .await?;
         let metrics_address = format!("http://{}:{}", ip_address, Self::METRICS_PORT);
 
-        tracing::info!(metrics_address, "Coordinator container is running",);
+        tracing::info!("Coordinator container is running",);
 
         Ok(Coordinator {
             container,

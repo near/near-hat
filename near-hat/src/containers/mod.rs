@@ -7,5 +7,6 @@ pub mod relayer;
 pub mod sandbox;
 pub mod hasura_auth;
 pub mod hasura_graphql;
-pub mod postgres;
+pub mod queryapi_postgres;
 pub mod coordinator;
+pub mod runner;

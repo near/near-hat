@@ -2,23 +2,28 @@ use crate::DockerClient;
 use testcontainers::core::WaitFor;
 use testcontainers::{Container, GenericImage, RunnableImage};
 
-pub struct Postgres<'a> {
+pub struct QueryApiPostgres<'a> {
     pub container: Container<'a, GenericImage>,
     pub connection_string: String,
+    pub postgres_host: String,
+    pub postgres_port: u16,
 }
 
-impl<'a> Postgres<'a> {
+impl<'a> QueryApiPostgres<'a> {
     const POSTGRES_PORT: u16 = 5432;
+    const POSTGRES_USERNAME: &str = "postgres";
+    const POSTGRES_PASSWORD: &str = "postgres";
+
 
     pub async fn run(
         docker_client: &'a DockerClient,
         network: &str,
-    ) -> anyhow::Result<Postgres<'a>> {
+    ) -> anyhow::Result<QueryApiPostgres<'a>> {
         tracing::info!(network, "starting Postgres container");
 
         let image = GenericImage::new("darunrs/queryapi", "postgres")
-            .with_env_var("POSTGRES_USER", "postgres")
-            .with_env_var("POSTGRES_PASSWORD", "postgres")
+            .with_env_var("POSTGRES_USER", Self::POSTGRES_USERNAME)
+            .with_env_var("POSTGRES_PASSWORD", Self::POSTGRES_PASSWORD)
             .with_exposed_port(Self::POSTGRES_PORT)
             .with_wait_for(WaitFor::message_on_stdout("ready to accept connections"));
 
@@ -36,9 +41,11 @@ impl<'a> Postgres<'a> {
 
         tracing::info!(connection_string, "Postgres container is running",);
 
-        Ok(Postgres {
+        Ok(QueryApiPostgres {
             container,
             connection_string,
+            postgres_host: ip_address,
+            postgres_port: Self::POSTGRES_PORT,
         })
     }
 

@@ -1,5 +1,5 @@
 version: 3
-endpoint: http://127.0.0.1:35094
+endpoint: http://127.0.0.1:35213
 admin_secret: myadminsecretkey
 metadata_directory: metadata
 actions:

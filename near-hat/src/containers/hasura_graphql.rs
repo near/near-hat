@@ -5,15 +5,17 @@ use testcontainers::{Container, GenericImage, RunnableImage};
 
 pub struct HasuraGraphql<'a> {
     pub container: Container<'a, GenericImage>,
-    pub graphql_address: String,
+    pub hasura_address: String,
 }
 
 impl<'a> HasuraGraphql<'a> {
     pub const CONTAINER_HASURA_GRAPHQL_PORT: u16 = 8080;
+    pub const HASURA_GRAPHQL_ADMIN_SECRET: &str = "myadminsecretkey";
 
     pub async fn run(
         docker_client: &'a DockerClient,
         network: &str,
+        hasura_auth_address: &str,
         postgres_address: &str,
     ) -> anyhow::Result<HasuraGraphql<'a>> {
         tracing::info!("starting Hasura Graphql container");
@@ -23,8 +25,8 @@ impl<'a> HasuraGraphql<'a> {
             .with_env_var("HASURA_GRAPHQL_ENABLE_CONSOLE", "true")
             .with_env_var("HASURA_GRAPHQL_DEV_MODE", "true")
             .with_env_var("HASURA_GRAPHQL_ENABLED_LOG_TYPES", "startup, http-log, webhook-log, websocket-log, query-log")
-            .with_env_var("HASURA_GRAPHQL_ADMIN_SECRET", "myadminsecretkey")
-            .with_env_var("HASURA_GRAPHQL_AUTH_HOOK", "http://hasura-auth:4000/auth")
+            .with_env_var("HASURA_GRAPHQL_ADMIN_SECRET", Self::HASURA_GRAPHQL_ADMIN_SECRET)
+            .with_env_var("HASURA_GRAPHQL_AUTH_HOOK", hasura_auth_address.to_owned() + "/auth")
             .with_exposed_port(Self::CONTAINER_HASURA_GRAPHQL_PORT);
         let image: RunnableImage<GenericImage> = image.into();
         let image = image.with_network(network);
@@ -33,16 +35,16 @@ impl<'a> HasuraGraphql<'a> {
         let ip_address = docker_client
             .get_network_ip_address(&container, network)
             .await?;
-        let graphql_address = format!("http://{}:{}", ip_address, Self::CONTAINER_HASURA_GRAPHQL_PORT);
+        let hasura_address = format!("http://{}:{}", ip_address, Self::CONTAINER_HASURA_GRAPHQL_PORT);
 
         tracing::info!(
-            graphql_address,
+            hasura_address,
             "Hasura Graphql container is running:"
         );
 
         Ok(HasuraGraphql {
             container,
-            graphql_address,
+            hasura_address,
         })
     }
 
