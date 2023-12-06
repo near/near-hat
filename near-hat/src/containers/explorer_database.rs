@@ -8,15 +8,19 @@ pub struct ExplorerDatabase<'a> {
 }
 
 impl<'a> ExplorerDatabase<'a> {
+    pub const CONTAINER_PORT: u16 = 5432;
+
     pub async fn run(
         docker_client: &'a DockerClient,
         network: &str,
     ) -> anyhow::Result<ExplorerDatabase<'a>> {
         tracing::info!(network, "starting NEAR Explorer Database container");
 
-        let image = GenericImage::new("morgsmccauley/explorer-database", "latest").with_wait_for(
-            WaitFor::message_on_stdout("database system is ready to accept connections"),
-        );
+        let image = GenericImage::new("morgsmccauley/explorer-database", "latest")
+            .with_wait_for(WaitFor::message_on_stdout(
+                "database system is ready to accept connections",
+            ))
+            .with_exposed_port(Self::CONTAINER_PORT);
 
         let image: RunnableImage<GenericImage> = (image, vec![]).into();
         let image = image.with_network(network);
@@ -37,5 +41,10 @@ impl<'a> ExplorerDatabase<'a> {
             container,
             connection_string,
         })
+    }
+
+    pub fn host_postgres_connection_string(&self) -> String {
+        let host_port = self.container.get_host_port_ipv4(Self::CONTAINER_PORT);
+        format!("postgres://postgres:postgres@localhost:{host_port}/postgres")
     }
 }
