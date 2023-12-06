@@ -1,9 +1,8 @@
+use super::lake_indexer::LakeIndexerCtx;
 use crate::client::DockerClient;
 use crate::containers::explorer_indexer::ExplorerIndexer;
-use crate::containers::localstack::LocalStack;
 
 pub struct ExplorerIndexerCtx<'a> {
-    pub localstack: LocalStack<'a>,
     pub explorer_indexer: ExplorerIndexer<'a>,
 }
 
@@ -11,16 +10,19 @@ impl<'a> ExplorerIndexerCtx<'a> {
     pub async fn new(
         docker_client: &'a DockerClient,
         network: &str,
+        lake_indexer_ctx: &LakeIndexerCtx<'a>,
     ) -> anyhow::Result<ExplorerIndexerCtx<'a>> {
-        let s3_bucket = "near-lake-custom".to_string();
-        let s3_region = "us-east-1".to_string();
-        let localstack =
-            LocalStack::run(docker_client, network, s3_bucket.clone(), s3_region.clone()).await?;
 
-        let explorer_indexer = ExplorerIndexer::run(docker_client, network).await?;
+        let explorer_indexer = ExplorerIndexer::run(
+            docker_client,
+            network,
+            &lake_indexer_ctx.localstack.s3_address,
+            &lake_indexer_ctx.localstack.s3_bucket,
+            &lake_indexer_ctx.localstack.s3_region,
+        )
+        .await?;
 
         Ok(ExplorerIndexerCtx {
-            localstack,
             explorer_indexer,
         })
     }

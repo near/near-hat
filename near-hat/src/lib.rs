@@ -25,7 +25,8 @@ impl<'a> NearHat<'a> {
         let lake_indexer_ctx = LakeIndexerCtx::new(&docker_client, network).await?;
         let nearcore_ctx = NearcoreCtx::new(&lake_indexer_ctx.worker).await?;
         let relayer_ctx = RelayerCtx::new(&docker_client, network, &nearcore_ctx).await?;
-        let explorer_indexer_ctx = ExplorerIndexerCtx::new(docker_client, network).await?;
+        let explorer_indexer_ctx =
+            ExplorerIndexerCtx::new(docker_client, network, &lake_indexer_ctx).await?;
 
         Ok(NearHat {
             lake_indexer_ctx,

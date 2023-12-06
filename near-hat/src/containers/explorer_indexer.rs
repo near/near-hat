@@ -10,21 +10,36 @@ impl<'a> ExplorerIndexer<'a> {
     pub async fn run(
         docker_client: &'a DockerClient,
         network: &str,
+        s3_endpoint: &str,
+        s3_bucket: &str,
+        s3_region: &str,
     ) -> anyhow::Result<ExplorerIndexer<'a>> {
-        tracing::info!(network, "starting NEAR Lake Indexer container");
+        tracing::info!(
+            network,
+            s3_endpoint,
+            s3_bucket,
+            s3_region,
+            "starting NEAR Explorer Indexer container"
+        );
 
-        let image = GenericImage::new(
-            "us-central1-docker.pkg.dev/pagoda-data-stack-dev/cloud-run-source-deploy/indexer-explorer",
-            "439ccdab3dfa60f503bf1ddcc4498595d5ad6339",
-        )
-        .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
-        .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
-        .with_env_var("DATABASE_URL", "test")
-        .with_wait_for(WaitFor::message_on_stderr("Starting Streamer"));
+        let image = GenericImage::new("explorer", "latest")
+            .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
+            .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
+            .with_env_var("DATABASE_URL", "test")
+            .with_env_var("S3_REGION", s3_region)
+            .with_env_var("AWS_REGION", s3_region)
+            .with_env_var("S3_URL", s3_endpoint)
+            .with_env_var("S3_BUCKET", s3_bucket)
+            .with_env_var("RPC_URL", "not needed")
+            .with_wait_for(WaitFor::message_on_stdout("Starting Indexer for Explorer"));
 
         let image: RunnableImage<GenericImage> = (
             image,
-            vec!["mainnet".to_string(), "from-genesis".to_string()],
+            vec![
+                "localnet".to_string(),
+                "from-block".to_string(),
+                "0".to_string(),
+            ],
         )
             .into();
         let image = image.with_network(network);
