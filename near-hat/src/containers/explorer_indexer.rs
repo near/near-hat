@@ -13,19 +13,21 @@ impl<'a> ExplorerIndexer<'a> {
         s3_endpoint: &str,
         s3_bucket: &str,
         s3_region: &str,
+        database_url: &str,
     ) -> anyhow::Result<ExplorerIndexer<'a>> {
         tracing::info!(
             network,
             s3_endpoint,
             s3_bucket,
             s3_region,
+            database_url,
             "starting NEAR Explorer Indexer container"
         );
 
         let image = GenericImage::new("explorer", "latest")
             .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
             .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
-            .with_env_var("DATABASE_URL", "test")
+            .with_env_var("DATABASE_URL", database_url)
             .with_env_var("S3_REGION", s3_region)
             .with_env_var("AWS_REGION", s3_region)
             .with_env_var("S3_URL", s3_endpoint)
