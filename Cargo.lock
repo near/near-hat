@@ -2021,6 +2021,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
+name = "globalenv"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "abea9ab8146b9eb3156387f938968e435f38c71414d96677e59b33771cee77b9"
+dependencies = [
+ "winreg 0.7.0",
+]
+
+[[package]]
 name = "goblin"
 version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2761,6 +2770,7 @@ dependencies = [
  "async-trait",
  "bollard",
  "futures",
+ "globalenv",
  "home",
  "near-crypto 0.17.0",
  "near-lake-framework",
@@ -2784,6 +2794,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap 4.4.10",
+ "globalenv",
  "near-hat",
  "tokio",
  "tracing",
@@ -4002,7 +4013,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "winreg",
+ "winreg 0.50.0",
 ]
 
 [[package]]
@@ -5658,6 +5669,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "829846f3e3db426d4cee4510841b71a8e58aa2a76b1132579487ae430ccd9c7b"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "winreg"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0120db82e8a1e0b9fb3345a539c478767c0048d842860994d96113d5b667bd69"
+dependencies = [
+ "winapi",
 ]
 
 [[package]]

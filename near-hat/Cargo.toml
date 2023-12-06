@@ -17,6 +17,7 @@ tempfile = "3.8"
 testcontainers = { version = "0.15", features = ["experimental"] }
 toml = "0.8.1"
 tracing = "0.1"
+globalenv = "0.4.2"
 
 near-crypto = "0.17"
 near-lake-framework = { git = "https://github.com/near/near-lake-framework-rs.git", branch = "main" }

@@ -2,6 +2,7 @@ use crate::DockerClient;
 use bollard::exec::CreateExecOptions;
 use testcontainers::core::WaitFor;
 use testcontainers::{Container, GenericImage, RunnableImage};
+use globalenv::set_var;
 
 pub struct LocalStack<'a> {
     pub container: Container<'a, GenericImage>,
@@ -23,7 +24,7 @@ impl<'a> LocalStack<'a> {
             network,
             s3_bucket,
             s3_region,
-            "starting LocalStack container"
+            "Starting LocalStack container"
         );
         let image = GenericImage::new("localstack/localstack", "3.0.0")
             .with_wait_for(WaitFor::message_on_stdout("Running on"));
@@ -63,12 +64,19 @@ impl<'a> LocalStack<'a> {
         let s3_address = format!("http://{}:{}", ip_address, Self::S3_CONTAINER_PORT);
         tracing::info!(s3_address, "LocalStack container is running");
 
-        Ok(LocalStack {
+        let result = LocalStack {
             container,
             s3_address,
             s3_bucket,
             s3_region,
-        })
+        };
+
+        set_var("NEARHAT_LAKE_S3", "http://lake.nearhat").unwrap();
+        set_var("NEARHAT_LAKE_S3_LOCAL", result.host_s3_address_ipv4().as_str()).unwrap();
+        set_var("NEARHAT_LAKE_S3_BUCKET", &result.s3_bucket.as_str()).unwrap();
+        set_var("NEARHAT_LAKE_S3_REGION", &result.s3_region.as_str()).unwrap();
+
+        Ok(result)
     }
 
     pub fn host_s3_address_ipv4(&self) -> String {
