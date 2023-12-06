@@ -14,7 +14,7 @@ impl<'a> ExplorerDatabase<'a> {
     ) -> anyhow::Result<ExplorerDatabase<'a>> {
         tracing::info!(network, "starting NEAR Explorer Database container");
 
-        let image = GenericImage::new("explorer-database", "latest").with_wait_for(
+        let image = GenericImage::new("morgsmccauley/explorer-database", "latest").with_wait_for(
             WaitFor::message_on_stdout("database system is ready to accept connections"),
         );
 

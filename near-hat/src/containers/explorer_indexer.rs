@@ -24,7 +24,7 @@ impl<'a> ExplorerIndexer<'a> {
             "starting NEAR Explorer Indexer container"
         );
 
-        let image = GenericImage::new("explorer", "latest")
+        let image = GenericImage::new("morgsmccauley/explorer-indexer", "latest")
             .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
             .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
             .with_env_var("DATABASE_URL", database_url)
