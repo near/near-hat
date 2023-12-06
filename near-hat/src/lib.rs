@@ -24,12 +24,19 @@ impl<'a> NearHat<'a> {
         docker_client: &'a DockerClient,
         network: &str,
     ) -> anyhow::Result<NearHat<'a>> {
-        let queryapi_ctx = QueryApiCtx::new(docker_client, network).await?;
         let lake_indexer_ctx = LakeIndexerCtx::new(&docker_client, network).await?;
         let nearcore_ctx = NearcoreCtx::new(&lake_indexer_ctx.worker).await?;
         let relayer_ctx = RelayerCtx::new(&docker_client, network, &nearcore_ctx).await?;
         let explorer_indexer_ctx =
             ExplorerIndexerCtx::new(docker_client, network, &lake_indexer_ctx).await?;
+        let queryapi_ctx = QueryApiCtx::new(
+            docker_client, network, 
+            &relayer_ctx.redis.redis_address, 
+            &lake_indexer_ctx.localstack.s3_address, 
+            &lake_indexer_ctx.localstack.s3_bucket, 
+            &lake_indexer_ctx.localstack.s3_region, 
+            "TO BE ADDED", 
+            &lake_indexer_ctx.lake_indexer.rpc_address).await?;
 
         Ok(NearHat {
             queryapi_ctx,

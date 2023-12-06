@@ -8,3 +8,4 @@ pub mod sandbox;
 pub mod hasura_auth;
 pub mod hasura_graphql;
 pub mod postgres;
+pub mod coordinator;

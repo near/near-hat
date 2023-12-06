@@ -1,4 +1,5 @@
 use crate::client::DockerClient;
+use crate::containers::coordinator::Coordinator;
 use crate::containers::hasura_auth::HasuraAuth;
 use crate::containers::postgres::Postgres;
 use crate::containers::hasura_graphql::HasuraGraphql;
@@ -11,12 +12,19 @@ pub struct QueryApiCtx<'a> {
     pub hasura_auth: HasuraAuth<'a>,
     pub postgres: Postgres<'a>,
     pub hasura_graphql: HasuraGraphql<'a>,
+    pub coordinator: Coordinator<'a>,
 }
 
 impl<'a> QueryApiCtx<'a> {
     pub async fn new(
         docker_client: &'a DockerClient,
-        network: &str
+        network: &str,
+        redis_address: &str,
+        s3_address: &str,
+        s3_bucket_name: &str,
+        s3_region: &str,
+        explorer_address: &str,
+        rpc_address: &str,
     ) -> anyhow::Result<QueryApiCtx<'a>> {
         let hasura_auth = HasuraAuth::run(docker_client, network).await?;
         let postgres = Postgres::run(docker_client, network).await?;
@@ -24,11 +32,16 @@ impl<'a> QueryApiCtx<'a> {
         if let Err(e) = Self::update_config_and_deploy_hasura(&hasura_graphql.host_address_ipv4(), Path::new("./hasura")) {
             eprintln!("Failed to update config and run 'hasura deploy': {}", e);
         }
+        let coordinator = Coordinator::run(
+            docker_client, network, redis_address, 
+            s3_address, s3_bucket_name, s3_region, 
+            explorer_address, rpc_address).await?;
 
         Ok(QueryApiCtx { 
             hasura_auth,
             postgres,
             hasura_graphql,
+            coordinator,
         })
     }
 

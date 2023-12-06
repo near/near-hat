@@ -53,6 +53,10 @@ async fn main() -> anyhow::Result<()> {
                 near_hat.queryapi_ctx.hasura_graphql.host_address_ipv4()
             );
             println!(
+                "  Redis: {}",
+                near_hat.relayer_ctx.redis.host_redis_address_ipv4()
+            );
+            println!(
                 "  Explorer Database: {}",
                 near_hat
                     .explorer_indexer_ctx
