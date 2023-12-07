@@ -1,13 +1,18 @@
+use near_token::NearToken;
+use near_workspaces::types::SecretKey;
+
 use crate::client::DockerClient;
 use crate::containers::coordinator::Coordinator;
 use crate::containers::hasura_auth::HasuraAuth;
 use crate::containers::queryapi_postgres::QueryApiPostgres;
 use crate::containers::hasura_graphql::HasuraGraphql;
 use crate::containers::runner::Runner;
-use std::fs::File;
+use std::fs::{File, self};
 use std::io::{Write, self};
 use std::process::Command;
 use std::path::Path;
+
+use super::nearcore::NearcoreCtx;
 
 pub struct QueryApiCtx<'a> {
     pub hasura_auth: HasuraAuth<'a>,
@@ -25,9 +30,22 @@ impl<'a> QueryApiCtx<'a> {
         s3_address: &str,
         s3_bucket_name: &str,
         s3_region: &str,
-        explorer_address: &str,
+        nearcore: &NearcoreCtx,
         rpc_address: &str,
     ) -> anyhow::Result<QueryApiCtx<'a>> {
+        let wasm_bytes = fs::read("wasm/registry.wasm")?;
+        // let sk = SecretKey::from_seed(
+        //     near_workspaces::types::KeyType::ED25519,
+        //     &rand::Rng::sample_iter(rand::thread_rng(), &rand::distributions::Alphanumeric)
+        //         .take(10)
+        //         .map(char::from)
+        //         .collect::<String>(),
+        // );
+
+        let registry_holder = nearcore.create_account("dev-queryapi", NearToken::from_near(69420)).await?;
+        let registry_contract = registry_holder.deploy(&wasm_bytes).await?.unwrap();
+        registry_contract.call("migrate");
+        // registry_holder.call(registry_holder.id(), "migrate");
         let hasura_auth = HasuraAuth::run(docker_client, network).await?;
         let postgres = QueryApiPostgres::run(docker_client, network).await?;
         let hasura_graphql = HasuraGraphql::run(docker_client, network, &hasura_auth.auth_address, &postgres.connection_string).await?;
@@ -41,8 +59,8 @@ impl<'a> QueryApiCtx<'a> {
             s3_address, 
             s3_bucket_name, 
             s3_region, 
-            explorer_address, 
-            rpc_address).await?;
+            rpc_address,
+            registry_contract.id()).await?;
 
         let runner = Runner::run(
             docker_client, 

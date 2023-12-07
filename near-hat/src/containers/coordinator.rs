@@ -17,8 +17,8 @@ impl<'a> Coordinator<'a> {
         s3_address: &str,
         s3_bucket_name: &str,
         s3_region: &str,
-        explorer_address: &str,
         rpc_address: &str,
+        registry_contract_id: &str,
     ) -> anyhow::Result<Coordinator<'a>> {
         tracing::info!(network, "starting Coordinator container");
 
@@ -29,16 +29,15 @@ impl<'a> Coordinator<'a> {
             .with_env_var("S3_URL", s3_address)
             .with_env_var("S3_BUCKET_NAME", s3_bucket_name)
             .with_env_var("RPC_ADDRESS", rpc_address)
-            .with_env_var("EXPLORER_ADDRESS", explorer_address)
             .with_env_var("REDIS_CONNECTION_STRING", redis_address)
             .with_env_var("PORT", Self::METRICS_PORT.to_string())
-            .with_env_var("REGISTRY_CONTRACT_ID", "dev-queryapi.dataplatform.near")
-            .with_wait_for(WaitFor::message_on_stdout("Starting queryapi_coordinator..."));
+            .with_env_var("REGISTRY_CONTRACT_ID", registry_contract_id);
+            // .with_wait_for(WaitFor::message_on_stdout("Starting queryapi_coordinator..."));
 
         let image: RunnableImage<GenericImage> = (
             image,
             vec![
-                "local-net".to_string(),
+                "localnet".to_string(),
                 "from-block".to_string(),
                 "0".to_string(),
             ],

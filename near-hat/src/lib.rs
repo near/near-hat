@@ -34,8 +34,8 @@ impl<'a> NearHat<'a> {
             &relayer_ctx.redis.redis_address, 
             &lake_indexer_ctx.localstack.s3_address, 
             &lake_indexer_ctx.localstack.s3_bucket, 
-            &lake_indexer_ctx.localstack.s3_region, 
-            "TO BE ADDED", 
+            &lake_indexer_ctx.localstack.s3_region,
+            &nearcore_ctx,
             &lake_indexer_ctx.lake_indexer.rpc_address).await?;
 
         Ok(NearHat {
