@@ -64,8 +64,6 @@ impl<'a> NearHat<'a> {
     }
 
     fn start_reverse_proxy(nearhat: &NearHat<'_>) -> std::io::Result<Child> {
-        Command::new("pwd").status();
-        Command::new("ls").arg("-la").status();
         let mut command = Command::new("mitmdump");
 
         command.arg("--mode").arg("regular").arg("-p").arg("80").arg("-s").arg("dns.py")
