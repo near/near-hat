@@ -9,6 +9,5 @@ clap = { version = "4.4", features = ["derive", "env"] }
 tokio = "1.28"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-globalenv = "0.4.2"
 
 near-hat = { path = "../near-hat" }

@@ -2,7 +2,6 @@ use crate::validator::ValidatorContainer;
 use crate::DockerClient;
 use testcontainers::core::WaitFor;
 use testcontainers::{Container, GenericImage, RunnableImage};
-use globalenv::set_var;
 
 pub struct LakeIndexer<'a> {
     pub container: Container<'a, GenericImage>,
@@ -65,18 +64,12 @@ impl<'a> LakeIndexer<'a> {
             "NEAR RPC with Lake Indexer is running"
         );
 
-        let result = LakeIndexer {
+        Ok(LakeIndexer {
             container,
             bucket_name,
             region,
             rpc_address,
-        };
-
-        set_var("NEARHAT_RPC", "http://rpc.nearhat").unwrap();
-        set_var("NEARHAT_RPC_LOCAL", result.host_rpc_address_ipv4().as_str()).unwrap();
-        set_var("NEARHAT_RPC_PORT", format!("{}", result.container.get_host_port_ipv4(Self::CONTAINER_RPC_PORT)).as_str()).unwrap();
-
-        Ok(result)
+        })
     }
 
     pub fn host_rpc_port_ipv4(&self) -> u16 {

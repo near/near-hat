@@ -2,9 +2,6 @@ use clap::Parser;
 use near_hat::{DockerClient, NearHat};
 use tokio::io::{stdin, AsyncReadExt};
 use tracing_subscriber::EnvFilter;
-use std::env;
-use globalenv::unset_var;
-
 
 #[derive(Parser, Debug)]
 pub enum Cli {
@@ -24,12 +21,6 @@ async fn main() -> anyhow::Result<()> {
             let docker_client = DockerClient::default();
             let mut near_hat = NearHat::new(&docker_client, "nearhat").await?;
 
-            println!("\nNEARHat environment is ready with following gloval environment variables:");
-            env::vars()
-                .filter(|(key, _)| key.starts_with("NEARHAT"))
-                .for_each(|(key, value)| {
-                    println!("{}: {}", key, value);
-                });
             println!("\nNEARHat environment is ready:");
             println!(
                 "  RPC: http://rpc.nearhat ({})",
@@ -71,11 +62,6 @@ async fn main() -> anyhow::Result<()> {
                 tokio::time::sleep(std::time::Duration::from_millis(25)).await;
             }
 
-            env::vars()
-                .filter(|(key, _)| key.starts_with("NEARHAT"))
-                .for_each(|(key, _)| {
-                    let _ = unset_var(&key);
-                });
             let _ = near_hat.reverse_proxy_process.kill();
         }
     }
