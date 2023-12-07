@@ -1,4 +1,6 @@
+pub mod explorer_backend;
 pub mod explorer_database;
+pub mod explorer_frontend;
 pub mod explorer_indexer;
 pub mod lake_indexer;
 pub mod localstack;

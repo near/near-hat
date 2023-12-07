@@ -59,9 +59,17 @@ async fn main() -> anyhow::Result<()> {
             println!(
                 "  Explorer Database: {}",
                 near_hat
-                    .explorer_indexer_ctx
-                    .explorer_database
+                    .explorer_ctx
+                    .database
                     .host_postgres_connection_string()
+            );
+            println!(
+                "  Explorer Backend: {}",
+                near_hat.explorer_ctx.backend.host_address_ipv4()
+            );
+            println!(
+                "  Explorer UI: {}",
+                near_hat.explorer_ctx.frontend.host_address_ipv4()
             );
 
             println!("\nPress any button to exit and destroy all containers...");
