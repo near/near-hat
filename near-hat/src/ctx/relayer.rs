@@ -19,7 +19,7 @@ impl<'a> RelayerCtx<'a> {
         network: &str,
         nearcore_ctx: &NearcoreCtx,
     ) -> anyhow::Result<RelayerCtx<'a>> {
-        let accounts_span = tracing::info!("initializing relayer accounts");
+        let accounts_span = tracing::info_span!("initializing relayer accounts");
         let relayer_account = nearcore_ctx
             .create_account("relayer", NearToken::from_near(1000))
             .await?;
@@ -50,7 +50,7 @@ impl<'a> RelayerCtx<'a> {
             relayer_account.id(),
             &relayer_account_keys,
             creator_account.id(),
-            &nearcore_ctx.social_db,
+            nearcore_ctx.social_db.id(),
             social_account.id(),
             social_account.secret_key(),
         )
