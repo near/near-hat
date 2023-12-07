@@ -256,6 +256,10 @@ impl<'a> Relayer<'a> {
         })
     }
 
+    pub fn host_relayer_port_ipv4(&self) -> u16 {
+        return self.container.get_host_port_ipv4(Self::CONTAINER_PORT);
+    }
+
     pub fn host_http_address_ipv4(&self) -> String {
         let host_port = self.container.get_host_port_ipv4(Self::CONTAINER_PORT);
         format!("http://127.0.0.1:{host_port}")

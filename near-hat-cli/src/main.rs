@@ -39,6 +39,16 @@ async fn main() -> anyhow::Result<()> {
                     .host_rpc_address_ipv4()
             );
             println!(
+                "  Relayer: http://relayer.nearhat ({}), Creator Account: {}",
+                near_hat.nearhat
+                    .relayer_ctx
+                    .relayer
+                    .host_http_address_ipv4(),
+                near_hat.nearhat
+                    .relayer_ctx
+                    .creator_account.id()
+            );
+            println!(
                 "  Explorer Database: {}",
                 near_hat.nearhat
                     .explorer_indexer_ctx
@@ -52,7 +62,8 @@ async fn main() -> anyhow::Result<()> {
                 near_hat.nearhat.lake_indexer_ctx.localstack.s3_bucket
             );
             println!(
-                "  Run `aws --endpoint-url=http://lake.nearhat s3 ls near-lake-custom/000000000001/` to access block data",
+                "  Run `aws --endpoint-url=http://lake.nearhat s3 ls {}/000000000001/` to access block data",
+                near_hat.nearhat.lake_indexer_ctx.localstack.s3_bucket
             );
 
             println!("\nPress any button to exit and destroy all containers...");

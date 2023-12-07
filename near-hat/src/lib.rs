@@ -56,6 +56,7 @@ impl<'a> NearHat<'a> {
         command.arg("--mode").arg("regular").arg("-p").arg("80").arg("-s").arg("dns.py")
             .env("NEARHAT_RPC_PORT", &nearhat.lake_indexer_ctx.lake_indexer.host_rpc_port_ipv4().to_string())
             .env("NEARHAT_LAKE_S3_PORT", &nearhat.lake_indexer_ctx.localstack.host_port_ipv4().to_string())
+            .env("NEARHAT_RELAYER_PORT", &nearhat.relayer_ctx.relayer.host_relayer_port_ipv4().to_string())
             .stdout(std::process::Stdio::null());
 
         return command.spawn();

@@ -7,10 +7,10 @@ use near_workspaces::types::SecretKey;
 use near_workspaces::Account;
 
 pub struct RelayerCtx<'a> {
-    pub(crate) redis: Redis<'a>,
-    pub(crate) relayer: Relayer<'a>,
-    pub(crate) creator_account: Account,
-    pub(crate) creator_account_keys: Vec<SecretKey>,
+    pub redis: Redis<'a>,
+    pub relayer: Relayer<'a>,
+    pub creator_account: Account,
+    pub creator_account_keys: Vec<SecretKey>,
 }
 
 impl<'a> RelayerCtx<'a> {
