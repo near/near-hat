@@ -28,6 +28,8 @@ async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId]) -> a
         tracing::info!(%contract, "imported contract");
         let state: Vec<u8> = readrpc_worker
             .view_state(contract)
+            .finality(near_workspaces::types::Finality::Final)
+            .prefix(b"STATE".as_slice())
             .await?
             .remove(b"STATE".as_slice())
             .unwrap();
