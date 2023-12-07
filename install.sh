@@ -1,7 +1,8 @@
 
 #!/bin/bash
 
-brew install dnsmasq mitmproxy
+brew install --cask docker
+brew install rust dnsmasq mitmproxy
 
 mkdir -pv $(brew --prefix)/etc/
 echo 'address=/.nearhat/127.0.0.1' >> $(brew --prefix)/etc/dnsmasq.conf
