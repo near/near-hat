@@ -1,6 +1,6 @@
 use crate::validator::ValidatorContainer;
 use crate::DockerClient;
-use testcontainers::{Container, GenericImage, RunnableImage};
+use testcontainers::{Container, GenericImage, RunnableImage, Image};
 
 pub struct HasuraGraphql<'a> {
     pub container: Container<'a, GenericImage>,
@@ -19,13 +19,15 @@ impl<'a> HasuraGraphql<'a> {
     ) -> anyhow::Result<HasuraGraphql<'a>> {
         tracing::info!("starting Hasura Graphql container");
 
-        let image = GenericImage::new("darunrs/queryapi", "hasura_graphql_engine")
+        let image = GenericImage::new("hasura/graphql-engine", "latest.cli-migrations-v3")
             .with_env_var("HASURA_GRAPHQL_DATABASE_URL", postgres_address)
             .with_env_var("HASURA_GRAPHQL_ENABLE_CONSOLE", "true")
             .with_env_var("HASURA_GRAPHQL_DEV_MODE", "true")
             .with_env_var("HASURA_GRAPHQL_ENABLED_LOG_TYPES", "startup, http-log, webhook-log, websocket-log, query-log")
             .with_env_var("HASURA_GRAPHQL_ADMIN_SECRET", Self::HASURA_GRAPHQL_ADMIN_SECRET)
             .with_env_var("HASURA_GRAPHQL_AUTH_HOOK", hasura_auth_address.to_owned() + "/auth")
+            .with_volume("./hasura/migrations", "/hasura-migrations")
+            .with_volume("./hasura/metadata", "/hasura-metadata")
             .with_exposed_port(Self::CONTAINER_HASURA_GRAPHQL_PORT);
         let image: RunnableImage<GenericImage> = image.into();
         let image = image.with_network(network);
