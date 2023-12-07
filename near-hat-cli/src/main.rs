@@ -32,23 +32,11 @@ async fn main() -> anyhow::Result<()> {
                 });
             println!("\nNEARHat environment is ready:");
             println!(
-                "  RPC: {}",
+                "  RPC: http://rpc.nearhat ({})",
                 near_hat.nearhat
                     .lake_indexer_ctx
                     .lake_indexer
                     .host_rpc_address_ipv4()
-            );
-            println!(
-                "  Lake Indexer S3 URL: {}",
-                near_hat.nearhat.lake_indexer_ctx.localstack.host_s3_address_ipv4()
-            );
-            println!(
-                "  Lake Indexer S3 Region: {}",
-                near_hat.nearhat.lake_indexer_ctx.localstack.s3_region
-            );
-            println!(
-                "  Lake Indexer S3 Bucket: {}",
-                near_hat.nearhat.lake_indexer_ctx.localstack.s3_bucket
             );
             println!(
                 "  Explorer Database: {}",
@@ -56,6 +44,15 @@ async fn main() -> anyhow::Result<()> {
                     .explorer_indexer_ctx
                     .explorer_database
                     .host_postgres_connection_string()
+            );
+            println!(
+                "  NEAR Lake S3: URL=http://lake.nearhat ({}), Region: {}, Bucket: {}",
+                near_hat.nearhat.lake_indexer_ctx.localstack.host_s3_address_ipv4(),
+                near_hat.nearhat.lake_indexer_ctx.localstack.s3_region,
+                near_hat.nearhat.lake_indexer_ctx.localstack.s3_bucket
+            );
+            println!(
+                "  Run `aws --endpoint-url=http://lake.nearhat s3 ls near-lake-custom/000000000001/` to access block data",
             );
 
             println!("\nPress any button to exit and destroy all containers...");
