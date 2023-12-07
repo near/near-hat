@@ -1,5 +1,4 @@
 use crate::DockerClient;
-use testcontainers::core::WaitFor;
 use testcontainers::{Container, GenericImage, RunnableImage};
 
 pub struct Runner<'a> {
@@ -19,7 +18,7 @@ impl<'a> Runner<'a> {
         postgres_host: &str,
         postgres_port: u16,
     ) -> anyhow::Result<Runner<'a>> {
-        tracing::info!(network, "starting Runner container");
+        tracing::info!(network, "starting QueryAPI Runner container");
 
         let image = GenericImage::new("darunrs/queryapi", "runner")
             .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
@@ -45,7 +44,7 @@ impl<'a> Runner<'a> {
             .await?;
         let metrics_address = format!("http://{}:{}", ip_address, Self::METRICS_PORT);
 
-        tracing::info!("Runner container is running",);
+        tracing::info!("QueryAPI Runner container is running",);
 
         Ok(Runner {
             container,

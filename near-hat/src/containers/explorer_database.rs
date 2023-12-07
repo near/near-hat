@@ -5,6 +5,8 @@ use testcontainers::{Container, GenericImage, RunnableImage};
 pub struct ExplorerDatabase<'a> {
     pub container: Container<'a, GenericImage>,
     pub connection_string: String,
+    pub host: String,
+    pub port: u16,
 }
 
 impl<'a> ExplorerDatabase<'a> {
@@ -32,7 +34,8 @@ impl<'a> ExplorerDatabase<'a> {
 
         let connection_string = format!(
             "postgres://postgres:postgres@{}:{}/postgres",
-            ip_address, 5432
+            ip_address,
+            Self::CONTAINER_PORT
         );
 
         tracing::info!("NEAR Explorer Database container is running");
@@ -40,11 +43,17 @@ impl<'a> ExplorerDatabase<'a> {
         Ok(ExplorerDatabase {
             container,
             connection_string,
+            host: ip_address,
+            port: Self::CONTAINER_PORT,
         })
     }
 
     pub fn host_postgres_connection_string(&self) -> String {
         let host_port = self.container.get_host_port_ipv4(Self::CONTAINER_PORT);
         format!("postgres://postgres:postgres@localhost:{host_port}/postgres")
+    }
+
+    pub fn host_postgres_port(&self) -> u16 {
+        self.container.get_host_port_ipv4(Self::CONTAINER_PORT)
     }
 }

@@ -25,7 +25,7 @@ impl<'a> LakeIndexer<'a> {
             s3_address,
             bucket_name,
             region,
-            "starting NEAR Lake Indexer container"
+            "Starting NEAR RPC with Lake Indexer container"
         );
 
         let image = GenericImage::new("ghcr.io/near/near-lake-indexer", "latest-sandbox")
@@ -58,14 +58,19 @@ impl<'a> LakeIndexer<'a> {
             bucket_name,
             region,
             rpc_address,
-            "NEAR Lake Indexer container is running"
+            "NEAR RPC with Lake Indexer is running"
         );
+
         Ok(LakeIndexer {
             container,
             bucket_name,
             region,
             rpc_address,
         })
+    }
+
+    pub fn host_rpc_port_ipv4(&self) -> u16 {
+        return self.container.get_host_port_ipv4(Self::CONTAINER_RPC_PORT);
     }
 
     pub fn host_rpc_address_ipv4(&self) -> String {
