@@ -9,8 +9,6 @@ Prequirements
 
 Tooling suite for local development in NEAR ecosystem.
 
-In order to run the queryapi components, you need to clone [QueryApi](https://github.com/near/queryapi) , and then run '''docker-compose build'''. This builds local images which are pulled and used for building the dockers. 
-
 To start:
 ```
 $ RUST_LOG=info cargo run -p near-hat-cli -- start
