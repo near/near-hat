@@ -35,7 +35,7 @@ impl<'a> QueryApiCtx<'a> {
     ) -> anyhow::Result<QueryApiCtx<'a>> {
         // Deploy registry contract and initialize it
         let wasm_bytes = fs::read("wasm/registry.wasm")?;
-        let registry_holder = nearcore.create_account("dev-queryapi", NearToken::from_near(69420)).await?;
+        let registry_holder = nearcore.create_account("dev-queryapi", NearToken::from_near(5)).await?;
         let registry_contract = registry_holder.deploy(&wasm_bytes).await?.unwrap();
         registry_contract.call("migrate");
 
