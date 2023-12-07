@@ -20,7 +20,7 @@ impl<'a> ExplorerBackend<'a> {
     ) -> anyhow::Result<ExplorerBackend<'a>> {
         tracing::info!(network, "starting NEAR Explorer Backend container");
 
-        let image = GenericImage::new("near-explorer-backend", "latest")
+        let image = GenericImage::new("morgsmccauley/explorer-backend", "latest")
             .with_env_var("NEAR_EXPLORER_CONFIG__ARCHIVAL_RPC_URL", rpc_url)
             .with_env_var("NEAR_EXPLORER_CONFIG__NETWORK_NAME", "localnet")
             .with_env_var(

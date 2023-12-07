@@ -18,9 +18,8 @@ impl<'a> ExplorerFrontend<'a> {
         backend_internal_port: u16,
     ) -> anyhow::Result<ExplorerFrontend<'a>> {
         tracing::info!(network, "starting NEAR Explorer Frontend container");
-        // NEAR_EXPLORER_CONFIG__SEGMENT_WRITE_KEY=7s4Na9mAfC7092R6pxrwpfBIAEek9Dne
 
-        let image = GenericImage::new("explorer-frontend", "latest")
+        let image = GenericImage::new("morgsmccauley/explorer-frontend", "latest")
             .with_env_var("NEAR_EXPLORER_CONFIG__SEGMENT_WRITE_KEY", "7s4Na9mAfC7092R6pxrwpfBIAEek9Dne")
             .with_env_var(
                 "NEAR_EXPLORER_CONFIG__NETWORKS",
