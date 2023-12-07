@@ -17,13 +17,23 @@ pub enum Cli {
 
 async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId]) -> anyhow::Result<()> {
     let _span = tracing::info_span!("spooning contracts");
-    let mainnet_worker = near_workspaces::mainnet().await?;
+    let readrpc_worker = near_workspaces::mainnet()
+        .rpc_addr("https://beta.rpc.mainnet.near.org")
+        .await?;
     for contract in contracts {
-        tracing::info!(%contract, "spooning contract");
         worker
-            .import_contract(contract, &mainnet_worker)
+            .import_contract(contract, &readrpc_worker)
             .transact()
             .await?;
+        tracing::info!(%contract, "imported contract");
+        let state: Vec<u8> = readrpc_worker
+            .view_state(contract)
+            .await?
+            .remove(b"STATE".as_slice())
+            .unwrap();
+        tracing::info!(%contract, state_size = state.len(), "pulled contract state");
+        worker.patch_state(contract, b"STATE", &state).await?;
+        tracing::info!(%contract, "patched contract state");
     }
     Ok(())
 }
