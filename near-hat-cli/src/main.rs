@@ -22,7 +22,7 @@ async fn main() -> anyhow::Result<()> {
     match Cli::parse() {
         Cli::Start {} => {
             let docker_client = DockerClient::default();
-            let near_hat = NearHat::new(&docker_client, "nearhat").await?;
+            let mut near_hat = NearHat::new(&docker_client, "nearhat").await?;
 
             println!("\nNEARHat environment is ready with following gloval environment variables:");
             env::vars()
@@ -33,26 +33,26 @@ async fn main() -> anyhow::Result<()> {
             println!("\nNEARHat environment is ready:");
             println!(
                 "  RPC: {}",
-                near_hat
+                near_hat.nearhat
                     .lake_indexer_ctx
                     .lake_indexer
                     .host_rpc_address_ipv4()
             );
             println!(
                 "  Lake Indexer S3 URL: {}",
-                near_hat.lake_indexer_ctx.localstack.host_s3_address_ipv4()
+                near_hat.nearhat.lake_indexer_ctx.localstack.host_s3_address_ipv4()
             );
             println!(
                 "  Lake Indexer S3 Region: {}",
-                near_hat.lake_indexer_ctx.localstack.s3_region
+                near_hat.nearhat.lake_indexer_ctx.localstack.s3_region
             );
             println!(
                 "  Lake Indexer S3 Bucket: {}",
-                near_hat.lake_indexer_ctx.localstack.s3_bucket
+                near_hat.nearhat.lake_indexer_ctx.localstack.s3_bucket
             );
             println!(
                 "  Explorer Database: {}",
-                near_hat
+                near_hat.nearhat
                     .explorer_indexer_ctx
                     .explorer_database
                     .host_postgres_connection_string()
@@ -68,6 +68,7 @@ async fn main() -> anyhow::Result<()> {
                 .for_each(|(key, _)| {
                     let _ = unset_var(&key);
                 });
+            let _ = near_hat.reverse_proxy_process.kill();
         }
     }
 

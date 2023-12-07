@@ -3,6 +3,7 @@ from mitmproxy import http
 from mitmproxy.connection import Server
 from mitmproxy.net.server_spec import ServerSpec
 import logging
+import os
 
 from mitmproxy.addonmanager import Loader
 from mitmproxy.log import ALERT
@@ -10,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 def proxy_address(flow: http.HTTPFlow) -> tuple[str, int]:
     if flow.request.pretty_host == "lake.nearhat":
-        return ("localhost", 55313)
+        return ("localhost", int(os.getenv('NEARHAT_LAKE_S3_PORT')))
     elif flow.request.pretty_host == "rpc.nearhat":
-        return ("localhost", 55364)
+        return ("localhost", int(os.getenv('NEARHAT_RPC_PORT')))
     else:
         return ("localhost", 3000)
 

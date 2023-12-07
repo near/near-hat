@@ -79,6 +79,10 @@ impl<'a> LakeIndexer<'a> {
         Ok(result)
     }
 
+    pub fn host_rpc_port_ipv4(&self) -> u16 {
+        return self.container.get_host_port_ipv4(Self::CONTAINER_RPC_PORT);
+    }
+
     pub fn host_rpc_address_ipv4(&self) -> String {
         let host_port = self.container.get_host_port_ipv4(Self::CONTAINER_RPC_PORT);
         format!("http://127.0.0.1:{host_port}")
