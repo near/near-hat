@@ -1,5 +1,4 @@
 use near_token::NearToken;
-use near_workspaces::types::SecretKey;
 
 use crate::client::DockerClient;
 use crate::containers::coordinator::Coordinator;
