@@ -40,6 +40,13 @@ async fn main() -> anyhow::Result<()> {
                 "  Lake Indexer S3 Bucket: {}",
                 near_hat.lake_indexer_ctx.localstack.s3_bucket
             );
+            println!(
+                "  Explorer Database: {}",
+                near_hat
+                    .explorer_indexer_ctx
+                    .explorer_database
+                    .host_postgres_connection_string()
+            );
 
             println!("\nPress any button to exit and destroy all containers...");
             while stdin().read(&mut [0]).await? == 0 {
