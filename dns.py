@@ -12,6 +12,8 @@ def proxy_address(flow: http.HTTPFlow) -> tuple[str, int]:
         return ("localhost", int(os.getenv('NEARHAT_RPC_PORT')))
     elif flow.request.pretty_host == "relayer.nearhat":
         return ("localhost", int(os.getenv('NEARHAT_RELAYER_PORT')))
+    elif flow.request.pretty_host == "explorer.nearhat":
+        return ("localhost", int(os.getenv('NEARHAT_EXPLORER_UI_PORT')))
     else:
         return ("localhost", 3000)
 
