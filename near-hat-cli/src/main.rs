@@ -40,6 +40,22 @@ async fn main() -> anyhow::Result<()> {
                     .creator_account.id()
             );
             println!(
+                "  Hasura Auth: {}",
+                near_hat.queryapi_ctx.hasura_auth.host_address_ipv4()
+            );
+            println!(
+                "  Postgres: {}",
+                near_hat.queryapi_ctx.postgres.host_postgres_address_ipv4()
+            );
+            println!(
+                "  Hasura Graphql: {}",
+                near_hat.queryapi_ctx.hasura_graphql.host_address_ipv4()
+            );
+            println!(
+                "  Redis: {}",
+                near_hat.relayer_ctx.redis.host_redis_address_ipv4()
+            );
+            println!(
                 "  Explorer Database: {}",
                 near_hat.nearhat
                     .explorer_indexer_ctx
@@ -55,6 +71,14 @@ async fn main() -> anyhow::Result<()> {
             println!(
                 "  Run `aws --endpoint-url=http://lake.nearhat s3 ls {}/000000000001/` to access block data",
                 near_hat.nearhat.lake_indexer_ctx.localstack.s3_bucket
+            );
+            println!(
+                "  Explorer Backend: {}",
+                near_hat.nearhat.explorer_ctx.backend.host_address_ipv4()
+            );
+            println!(
+                "  Explorer UI: {}",
+                near_hat.nearhat.explorer_ctx.frontend.host_address_ipv4()
             );
 
             println!("\nPress any button to exit and destroy all containers...");
