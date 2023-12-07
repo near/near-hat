@@ -2785,6 +2785,8 @@ dependencies = [
  "anyhow",
  "clap 4.4.10",
  "near-hat",
+ "near-primitives 0.17.0",
+ "near-workspaces",
  "tokio",
  "tracing",
  "tracing-subscriber",

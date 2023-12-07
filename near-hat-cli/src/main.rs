@@ -1,11 +1,31 @@
 use clap::Parser;
 use near_hat::{DockerClient, NearHat};
+use near_primitives::types::AccountId;
+use near_workspaces::network::Sandbox;
+use near_workspaces::Worker;
 use tokio::io::{stdin, AsyncReadExt};
 use tracing_subscriber::EnvFilter;
 
 #[derive(Parser, Debug)]
 pub enum Cli {
-    Start {},
+    Start {
+        /// Contracts to spoon from mainnet.
+        #[arg(long, value_parser, num_args = 1.., value_delimiter = ',')]
+        contracts_to_spoon: Vec<AccountId>,
+    },
+}
+
+async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId]) -> anyhow::Result<()> {
+    let _span = tracing::info_span!("spooning contracts");
+    let mainnet_worker = near_workspaces::mainnet().await?;
+    for contract in contracts {
+        tracing::info!(%contract, "spooning contract");
+        worker
+            .import_contract(contract, &mainnet_worker)
+            .transact()
+            .await?;
+    }
+    Ok(())
 }
 
 #[tokio::main]
@@ -17,9 +37,10 @@ async fn main() -> anyhow::Result<()> {
     subscriber.init();
 
     match Cli::parse() {
-        Cli::Start {} => {
+        Cli::Start { contracts_to_spoon } => {
             let docker_client = DockerClient::default();
             let near_hat = NearHat::new(&docker_client, "nearhat").await?;
+            spoon_contracts(&near_hat.lake_indexer_ctx.worker, &contracts_to_spoon).await?;
             println!("\nNEARHat environment is ready:");
             println!(
                 "  RPC: {}",

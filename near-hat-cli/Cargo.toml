@@ -11,3 +11,5 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 near-hat = { path = "../near-hat" }
+near-primitives = "0.17"
+near-workspaces = "0.9.0"
