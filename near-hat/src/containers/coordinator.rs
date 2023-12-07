@@ -22,7 +22,7 @@ impl<'a> Coordinator<'a> {
     ) -> anyhow::Result<Coordinator<'a>> {
         tracing::info!(network, "starting Coordinator container");
 
-        let image = GenericImage::new("queryapi-mvp-coordinator", "latest")
+        let image = GenericImage::new("darunrs/queryapi", "coordinator")
             .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
             .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
             .with_env_var("AWS_REGION", s3_region)

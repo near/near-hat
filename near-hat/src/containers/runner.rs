@@ -21,7 +21,7 @@ impl<'a> Runner<'a> {
     ) -> anyhow::Result<Runner<'a>> {
         tracing::info!(network, "starting Runner container");
 
-        let image = GenericImage::new("queryapi-mvp-runner", "latest")
+        let image = GenericImage::new("darunrs/queryapi", "runner")
             .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
             .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
             .with_env_var("REGION", region)
