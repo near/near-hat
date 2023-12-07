@@ -22,14 +22,41 @@ async fn main() -> anyhow::Result<()> {
     match Cli::parse() {
         Cli::Start {} => {
             let docker_client = DockerClient::default();
-            NearHat::new(&docker_client, "nearhat").await?;
-            
+            let near_hat = NearHat::new(&docker_client, "nearhat").await?;
+
             println!("\nNEARHat environment is ready with following gloval environment variables:");
             env::vars()
                 .filter(|(key, _)| key.starts_with("NEARHAT"))
                 .for_each(|(key, value)| {
                     println!("{}: {}", key, value);
                 });
+            println!("\nNEARHat environment is ready:");
+            println!(
+                "  RPC: {}",
+                near_hat
+                    .lake_indexer_ctx
+                    .lake_indexer
+                    .host_rpc_address_ipv4()
+            );
+            println!(
+                "  Lake Indexer S3 URL: {}",
+                near_hat.lake_indexer_ctx.localstack.host_s3_address_ipv4()
+            );
+            println!(
+                "  Lake Indexer S3 Region: {}",
+                near_hat.lake_indexer_ctx.localstack.s3_region
+            );
+            println!(
+                "  Lake Indexer S3 Bucket: {}",
+                near_hat.lake_indexer_ctx.localstack.s3_bucket
+            );
+            println!(
+                "  Explorer Database: {}",
+                near_hat
+                    .explorer_indexer_ctx
+                    .explorer_database
+                    .host_postgres_connection_string()
+            );
 
             println!("\nPress any button to exit and destroy all containers...");
             while stdin().read(&mut [0]).await? == 0 {
