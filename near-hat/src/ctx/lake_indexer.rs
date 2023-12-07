@@ -17,7 +17,7 @@ impl<'a> LakeIndexerCtx<'a> {
         docker_client: &'a DockerClient,
         network: &str,
     ) -> anyhow::Result<LakeIndexerCtx<'a>> {
-        let s3_bucket = "near-lake-custom".to_string();
+        let s3_bucket = "localnet".to_string();
         let s3_region = "us-east-1".to_string();
         let localstack =
             LocalStack::run(docker_client, network, s3_bucket.clone(), s3_region.clone()).await?;

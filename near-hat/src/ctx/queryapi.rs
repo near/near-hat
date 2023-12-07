@@ -1,5 +1,4 @@
 use near_token::NearToken;
-use near_workspaces::types::SecretKey;
 
 use crate::client::DockerClient;
 use crate::containers::coordinator::Coordinator;
@@ -96,6 +95,7 @@ impl<'a> QueryApiCtx<'a> {
         file.write_all(config_content.as_bytes())?;
     
         // Step 2: Run hasura deploy
+        let original_dir = std::env::current_dir()?;
         std::env::set_current_dir(hasura_folder)?;
     
         let output = Command::new("hasura")
@@ -107,6 +107,8 @@ impl<'a> QueryApiCtx<'a> {
         } else {
             eprintln!("Error in running Hasura deploy: {}", String::from_utf8_lossy(&output.stderr));
         }
+        // Step 3: Revert current directory
+        std::env::set_current_dir(original_dir)?;
     
         Ok(())
     }

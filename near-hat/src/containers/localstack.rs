@@ -23,7 +23,7 @@ impl<'a> LocalStack<'a> {
             network,
             s3_bucket,
             s3_region,
-            "starting LocalStack container"
+            "Starting LocalStack container"
         );
         let image = GenericImage::new("localstack/localstack", "3.0.0")
             .with_wait_for(WaitFor::message_on_stdout("Running on"));
@@ -69,6 +69,10 @@ impl<'a> LocalStack<'a> {
             s3_bucket,
             s3_region,
         })
+    }
+    
+    pub fn host_port_ipv4(&self) -> u16 {
+        return self.container.get_host_port_ipv4(Self::S3_CONTAINER_PORT);
     }
 
     pub fn host_s3_address_ipv4(&self) -> String {
