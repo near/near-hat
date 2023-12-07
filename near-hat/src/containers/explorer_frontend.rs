@@ -55,6 +55,10 @@ impl<'a> ExplorerFrontend<'a> {
         Ok(ExplorerFrontend { container })
     }
 
+    pub fn host_frontend_port_ipv4(&self) -> u16 {
+        return self.container.get_host_port_ipv4(Self::CONTAINER_PORT);
+    }
+
     pub fn host_address_ipv4(&self) -> String {
         let host_port = self.container.get_host_port_ipv4(Self::CONTAINER_PORT);
         format!("http://127.0.0.1:{host_port}")

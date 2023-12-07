@@ -48,10 +48,11 @@ impl<'a> NearHat<'a> {
         let explorer_ctx = ExplorerCtx::new(docker_client, network, &lake_indexer_ctx).await?;
 
         let nearhat = NearHat {
+            queryapi_ctx,
             lake_indexer_ctx,
             nearcore_ctx,
             relayer_ctx,
-            explorer_indexer_ctx,
+            explorer_ctx,
         };
 
         let reverse_proxy_process = Self::start_reverse_proxy(&nearhat)?;
@@ -63,12 +64,15 @@ impl<'a> NearHat<'a> {
     }
 
     fn start_reverse_proxy(nearhat: &NearHat<'_>) -> std::io::Result<Child> {
+        Command::new("pwd").status();
+        Command::new("ls").arg("-la").status();
         let mut command = Command::new("mitmdump");
 
         command.arg("--mode").arg("regular").arg("-p").arg("80").arg("-s").arg("dns.py")
             .env("NEARHAT_RPC_PORT", &nearhat.lake_indexer_ctx.lake_indexer.host_rpc_port_ipv4().to_string())
             .env("NEARHAT_LAKE_S3_PORT", &nearhat.lake_indexer_ctx.localstack.host_port_ipv4().to_string())
             .env("NEARHAT_RELAYER_PORT", &nearhat.relayer_ctx.relayer.host_relayer_port_ipv4().to_string())
+            .env("NEARHAT_EXPLORER_UI_PORT", &nearhat.explorer_ctx.frontend.host_frontend_port_ipv4().to_string())
             .stdout(std::process::Stdio::null());
 
         return command.spawn();

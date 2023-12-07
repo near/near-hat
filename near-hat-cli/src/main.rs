@@ -40,26 +40,26 @@ async fn main() -> anyhow::Result<()> {
                     .creator_account.id()
             );
             println!(
-                "  Hasura Auth: {}",
-                near_hat.queryapi_ctx.hasura_auth.host_address_ipv4()
+                "  Relayer Redis: {}",
+                near_hat.nearhat.relayer_ctx.redis.host_redis_address_ipv4()
             );
             println!(
-                "  Postgres: {}",
-                near_hat.queryapi_ctx.postgres.host_postgres_address_ipv4()
+                "  QueryAPI Hasura Auth: {}",
+                near_hat.nearhat.queryapi_ctx.hasura_auth.host_address_ipv4()
             );
             println!(
-                "  Hasura Graphql: {}",
-                near_hat.queryapi_ctx.hasura_graphql.host_address_ipv4()
+                "  QueryAPI Postgres: {}",
+                near_hat.nearhat.queryapi_ctx.postgres.host_postgres_address_ipv4()
             );
             println!(
-                "  Redis: {}",
-                near_hat.relayer_ctx.redis.host_redis_address_ipv4()
+                "  QueryAPI Graphql Playground: {}",
+                near_hat.nearhat.queryapi_ctx.hasura_graphql.host_address_ipv4()
             );
             println!(
                 "  Explorer Database: {}",
                 near_hat.nearhat
-                    .explorer_indexer_ctx
-                    .explorer_database
+                    .explorer_ctx
+                    .database
                     .host_postgres_connection_string()
             );
             println!(
@@ -77,7 +77,7 @@ async fn main() -> anyhow::Result<()> {
                 near_hat.nearhat.explorer_ctx.backend.host_address_ipv4()
             );
             println!(
-                "  Explorer UI: {}",
+                "  Explorer Frontend: http://explorer.nearhat ({})",
                 near_hat.nearhat.explorer_ctx.frontend.host_address_ipv4()
             );
 
