@@ -79,7 +79,7 @@ async fn main() -> anyhow::Result<()> {
             );
             println!(
                 "  Relayer Redis: {}",
-                near_hat.nearhat.relayer_ctx.redis.host_redis_address_ipv4()
+                near_hat.nearhat.relayer_ctx.redis.host_redis_connection_ipv4()
             );
             println!(
                 "  QueryAPI Hasura Auth: {}",

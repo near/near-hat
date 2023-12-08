@@ -1,6 +1,8 @@
+use near_crypto::KeyFile;
 use std::fs;
 
 use near_token::NearToken;
+use serde_json::json;
 
 use crate::client::DockerClient;
 use crate::containers::coordinator::Coordinator;
@@ -29,12 +31,22 @@ impl<'a> QueryApiCtx<'a> {
         s3_region: &str,
         nearcore: &NearcoreCtx,
         rpc_address: &str,
+        validator_key: &KeyFile,
     ) -> anyhow::Result<QueryApiCtx<'a>> {
         // Deploy registry contract and initialize it
         let wasm_bytes = fs::read("wasm/registry.wasm")?;
-        let registry_holder = nearcore.create_account("dev-queryapi", NearToken::from_near(5)).await?;
+        let registry_holder = nearcore.create_account("dev-queryapi", NearToken::from_near(50)).await?;
         let registry_contract = registry_holder.deploy(&wasm_bytes).await?.unwrap();
-        registry_contract.call("migrate");
+
+        // Write validator and queryapi account keys to file for use
+        let keys = json!({
+            validator_key.account_id.clone(): validator_key.secret_key,
+            registry_holder.id().to_owned(): registry_holder.secret_key()
+        });
+        
+        let keys_path = Path::new("./tests/data/keys.json");
+        let mut file = File::create(&keys_path).expect("Unable to create file to store private keys");
+        writeln!(file, "{}", keys.to_string()).expect("Unable to write private keys to file");
 
         // Set up dockers
         let hasura_auth = HasuraAuth::run(docker_client, network).await?;
@@ -61,13 +73,13 @@ impl<'a> QueryApiCtx<'a> {
 
 
         // Create generic indexer and register it
-        let register_function_args = serde_json::json!({
-            "function_name": "test_sweat_blockheight",
-            "code": "\n  const h = block.header().height;\n  await context.db.IndexerStorage.upsert({function_name: 'darunrs.near/test_sweat_blockheight', key_name: 'height', value: h.toString()}, [\"function_name\", \"key_name\"], [\"value\"]);\n",
-            "schema": "CREATE TABLE\n  \"indexer_storage\" (\n    \"function_name\" TEXT NOT NULL,\n    \"key_name\" TEXT NOT NULL,\n    \"value\" TEXT NOT NULL,\n    PRIMARY KEY (\"function_name\", \"key_name\")\n  )\n",
-            "filter_json": "{\"indexer_rule_kind\":\"Action\",\"matching_rule\":{\"rule\":\"ACTION_ANY\",\"affected_account_id\":\"*.near\",\"status\":\"SUCCESS\"}}"
-          });
-        registry_holder.call(registry_holder.id(), "register_indexer_function").args(serde_json::to_vec(&register_function_args).unwrap()).transact().await?;
+        // let register_function_args = serde_json::json!({
+        //     "function_name": "test_sweat_blockheight",
+        //     "code": "\n  const h = block.header().height;\n  await context.db.IndexerStorage.upsert({function_name: 'darunrs.near/test_sweat_blockheight', key_name: 'height', value: h.toString()}, [\"function_name\", \"key_name\"], [\"value\"]);\n",
+        //     "schema": "CREATE TABLE\n  \"indexer_storage\" (\n    \"function_name\" TEXT NOT NULL,\n    \"key_name\" TEXT NOT NULL,\n    \"value\" TEXT NOT NULL,\n    PRIMARY KEY (\"function_name\", \"key_name\")\n  )\n",
+        //     "filter_json": "{\"indexer_rule_kind\":\"Action\",\"matching_rule\":{\"rule\":\"ACTION_ANY\",\"affected_account_id\":\"*.near\",\"status\":\"SUCCESS\"}}"
+        //   });
+        // registry_holder.call(registry_holder.id(), "register_indexer_function").args(serde_json::to_vec(&register_function_args).unwrap()).transact().await?;
 
         Ok(QueryApiCtx { 
             hasura_auth,

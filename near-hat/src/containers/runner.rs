@@ -23,6 +23,7 @@ impl<'a> Runner<'a> {
         let image = GenericImage::new("darunrs/queryapi", "runner")
             .with_env_var("AWS_ACCESS_KEY_ID", "FAKE_LOCALSTACK_KEY_ID")
             .with_env_var("AWS_SECRET_ACCESS_KEY", "FAKE_LOCALSTACK_ACCESS_KEY")
+            .with_env_var("AWS_REGION", region)
             .with_env_var("REGION", region)
             .with_env_var("REDIS_CONNECTION_STRING", redis_address)
             .with_env_var("HASURA_ENDPOINT", hasura_address)

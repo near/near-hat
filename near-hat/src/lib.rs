@@ -43,6 +43,7 @@ impl<'a> NearHat<'a> {
             &lake_indexer_ctx.localstack.s3_region,
             &nearcore_ctx,
             &lake_indexer_ctx.lake_indexer.rpc_address,
+            &lake_indexer_ctx.validator_key,
         )
         .await?;
         let explorer_ctx = ExplorerCtx::new(docker_client, network, &lake_indexer_ctx).await?;

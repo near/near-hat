@@ -2,6 +2,7 @@ use crate::client::DockerClient;
 use crate::containers::lake_indexer::LakeIndexer;
 use crate::containers::localstack::LocalStack;
 use crate::validator::ValidatorContainer;
+use near_crypto::KeyFile;
 use near_workspaces::network::{Sandbox, ValidatorKey};
 use near_workspaces::Worker;
 
@@ -10,6 +11,7 @@ pub struct LakeIndexerCtx<'a> {
     pub lake_indexer: LakeIndexer<'a>,
     // FIXME: Technically this network is not sandbox, but workspaces does not support plain localnet
     pub worker: Worker<Sandbox>,
+    pub validator_key: KeyFile,
 }
 
 impl<'a> LakeIndexerCtx<'a> {
@@ -46,6 +48,7 @@ impl<'a> LakeIndexerCtx<'a> {
             localstack,
             lake_indexer,
             worker,
+            validator_key
         })
     }
 }

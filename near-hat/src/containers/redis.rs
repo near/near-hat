@@ -38,10 +38,24 @@ impl<'a> Redis<'a> {
         format!("http://127.0.0.1:{host_port}")
     }
 
+    pub fn host_redis_connection_ipv4(&self) -> String {
+        let host_port = self
+            .container
+            .get_host_port_ipv4(6379);
+        format!("http://127.0.0.1:{host_port}")
+    }
+
     pub fn host_redis_address_ipv6(&self) -> String {
         let host_port = self
             .container
             .get_host_port_ipv6(Self::CONTAINER_REDIS_PORT);
+        format!("http://[::1]:{host_port}")
+    }
+
+    pub fn host_redis_connection_ipv6(&self) -> String {
+        let host_port = self
+            .container
+            .get_host_port_ipv6(6379);
         format!("http://[::1]:{host_port}")
     }
 }
