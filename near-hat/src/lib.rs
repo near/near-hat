@@ -72,6 +72,7 @@ impl<'a> NearHat<'a> {
             .env("NEARHAT_LAKE_S3_PORT", &nearhat.lake_indexer_ctx.localstack.host_port_ipv4().to_string())
             .env("NEARHAT_RELAYER_PORT", &nearhat.relayer_ctx.relayer.host_relayer_port_ipv4().to_string())
             .env("NEARHAT_EXPLORER_UI_PORT", &nearhat.explorer_ctx.frontend.host_frontend_port_ipv4().to_string())
+            .env("NEARHAT_GRAPHQL_PLAYGROUND_PORT", &nearhat.queryapi_ctx.hasura_graphql.host_playground_port_ipv4().to_string())
             .stdout(std::process::Stdio::null());
 
         return command.spawn();

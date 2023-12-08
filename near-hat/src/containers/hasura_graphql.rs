@@ -53,6 +53,10 @@ impl<'a> HasuraGraphql<'a> {
         })
     }
 
+    pub fn host_playground_port_ipv4(&self) -> u16 {
+        return self.container.get_host_port_ipv4(Self::CONTAINER_HASURA_GRAPHQL_PORT);
+    }
+
     pub fn host_address_ipv4(&self) -> String {
         let host_port = self.container.get_host_port_ipv4(Self::CONTAINER_HASURA_GRAPHQL_PORT);
         format!("http://127.0.0.1:{host_port}")
