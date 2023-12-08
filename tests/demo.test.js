@@ -49,6 +49,11 @@ describe('Hackathon Demo', () => {
                 },
             });
         }
+
+        // Let indexer index calls
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+
         const query = `query MyQuery {
             dev_queryapi_test_near_test_indexer_indexers {
               methodname
