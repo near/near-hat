@@ -4,7 +4,6 @@ use near_workspaces::{AccessKey, Account, Contract, Worker};
 
 pub struct NearcoreCtx {
     pub(crate) worker: Worker<Sandbox>,
-    pub(crate) social_db: Contract,
 }
 
 impl NearcoreCtx {
@@ -44,14 +43,12 @@ impl NearcoreCtx {
     }
 
     pub async fn new(worker: &Worker<Sandbox>) -> anyhow::Result<NearcoreCtx> {
-        // FIXME: Initializing linkdrop and socialdb does not work as it requires an actual sandbox instance with patch_state
-        Self::initialize_linkdrop(worker).await?;
+        // Self::initialize_linkdrop(worker).await?;
         // TODO: move out of nearcore trait into its own ctx
-        let social_db = Self::initialize_social_db(worker).await?;
+        // let social_db = Self::initialize_social_db(worker).await?;
 
         Ok(NearcoreCtx {
             worker: worker.clone(),
-            social_db,
         })
     }
 
