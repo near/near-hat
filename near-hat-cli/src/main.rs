@@ -2,6 +2,7 @@ use clap::Parser;
 use near_hat::{DockerClient, NearHat};
 use tokio::io::{stdin, AsyncReadExt};
 use tracing_subscriber::EnvFilter;
+extern crate ctrlc;
 
 #[derive(Parser, Debug)]
 pub enum Cli {
@@ -82,10 +83,20 @@ async fn main() -> anyhow::Result<()> {
             );
 
             println!("\nPress any button to exit and destroy all containers...");
-            while stdin().read(&mut [0]).await? == 0 {
+
+            // Create a mutable flag to indicate if CTRL+C was received
+            let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
+            let r = running.clone();
+
+            // Set up a CTRL+C handler
+            ctrlc::set_handler(move || {
+                r.store(false, std::sync::atomic::Ordering::SeqCst);
+            }).expect("Error setting Ctrl-C handler");
+
+            while stdin().read(&mut [0]).await? == 0 && running.load(std::sync::atomic::Ordering::SeqCst) {
                 tokio::time::sleep(std::time::Duration::from_millis(25)).await;
             }
-
+            println!("\nTerminating all Docker containers and reverse proxy...");
             let _ = near_hat.reverse_proxy_process.kill();
         }
     }
