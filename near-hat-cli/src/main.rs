@@ -98,7 +98,7 @@ async fn main() -> anyhow::Result<()> {
                     .host_postgres_address_ipv4()
             );
             println!(
-                "  QueryAPI Graphql Playground: {}",
+                "  Graphql Playground: http://playground.nearhat ({})",
                 near_hat
                     .nearhat
                     .queryapi_ctx
