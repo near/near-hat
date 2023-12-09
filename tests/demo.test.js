@@ -40,8 +40,7 @@ describe('Hackathon Demo', () => {
 
         // Mint 100 USDT to Alice
         const response = await adminUsdtContractSigner.mint({
-            account_id: alice.accountId,
-            amount: "100000000"
+            args: { account_id: alice.accountId, amount: "100000000" }
         });
         assert.strictEqual(
           await adminUsdtContractSigner.ft_balance_of(
@@ -53,14 +52,10 @@ describe('Hackathon Demo', () => {
           viewMethods: [],
           changeMethods: ['ft_transfer', 'storage_deposit'],
         });
-        await aliceUsdtContractSigner.ft_transfer(
-          {
-            receiver_id: bob.accountId,
-            amount: "50000000"
-          }, 
-          "300000000000000",
-          "1"
-        );
+        await aliceUsdtContractSigner.ft_transfer({
+          args: { receiver_id: bob.accountId, amount: "50000000" },
+          gas: "300000000000000", amount: "1"
+        });
 
         // Verify Alice and Bob both have 50 USDT
         assert.strictEqual(await adminUsdtContractSigner.ft_balance_of(
@@ -72,7 +67,7 @@ describe('Hackathon Demo', () => {
 
         // // Wait for indexer to index latest transactions
         console.log("Waiting for indexer to index latest transactions...");
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
 
         // assert QueryAPI has mint, transfer
         const query = `query MyQuery {
@@ -88,7 +83,7 @@ describe('Hackathon Demo', () => {
         // Check if 'ft_transfer' is present
         const hasFtTransfer = events.some(e => e.event === 'ft_transfer');
         assert(hasFtTransfer, "'ft_transfer' event not found");
-    }, 30000);
+    }, 60000);
 });
 
 function doLastElementsMatch(resultArray, expectedArray) {
