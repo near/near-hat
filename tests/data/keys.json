@@ -1,10 +1,10 @@
 {
   "dev-queryapi.test.near": "ed25519:3JtQnV5Tm5GM35t24mytoqR4UbLEAa6km4tiPXd6ubXebCrviQ7usSWJNKFYNyFkmtf6D2qZfN9ZUw8C2mibXw1C",
-  "near": "ed25519:3m53cFQXNgLb7U8SK2cCSkDMUHU2TRGfg5TbxNB4Jc6BPnvhgGCTXqDQzxy3hM9EnJcKgkUnbWBrUUMe2LMoWiJa",
-  "test.near": "ed25519:58mpP3ZkKfquredApoKvfzPxtzeZ2Rxf3FkWvGXB1yaL14CJKuqX1t1KC5twTbJeWqYzhi3GPKg8fXhG81xSVs1D",
-  "usdt.tether-token.near": "ed25519:49gdkVTevKiBKsGGor3KVCoWkZapeJJ7KpCiEFMpCQxxaZuCw6ChHqU1uR5w1ido3RCrHNQxqvtpqfFJqdGQ1bE9",
-  "multisafe.near": "ed25519:3m53cFQXNgLb7U8SK2cCSkDMUHU2TRGfg5TbxNB4Jc6BPnvhgGCTXqDQzxy3hM9EnJcKgkUnbWBrUUMe2LMoWiJa",
-  "tether.multisafe.near": "ed25519:3m53cFQXNgLb7U8SK2cCSkDMUHU2TRGfg5TbxNB4Jc6BPnvhgGCTXqDQzxy3hM9EnJcKgkUnbWBrUUMe2LMoWiJa",
-  "alice.near": "ed25519:3m53cFQXNgLb7U8SK2cCSkDMUHU2TRGfg5TbxNB4Jc6BPnvhgGCTXqDQzxy3hM9EnJcKgkUnbWBrUUMe2LMoWiJa",
-  "bob.near": "ed25519:3m53cFQXNgLb7U8SK2cCSkDMUHU2TRGfg5TbxNB4Jc6BPnvhgGCTXqDQzxy3hM9EnJcKgkUnbWBrUUMe2LMoWiJa"
+  "near": "ed25519:3kRos1kbsjmZnuxQ9UTRWXtMMrQxutwzJD5pTkHNyy7XWEkU2uoTdFxSp5gmwBinWrmqSjp87njtQtM1MZC87rbw",
+  "test.near": "ed25519:65HL1AjMhtXqM3RTaXj7KXVhGk9h1sZaxYP4uB3e93yasuL1cGWxyK8YcQRR5o5o2iQxdezU8o9oo4nR7ANPqezK",
+  "usdt.tether-token.near": "ed25519:jWduy2QEhjQVTUTSu4MjTKKpYrcGz68jdJ73pytTRm4dRNhCJkbSHda5ZhMSAWveXDaHxEBQp3NuCM35stbJLiN",
+  "multisafe.near": "ed25519:3kRos1kbsjmZnuxQ9UTRWXtMMrQxutwzJD5pTkHNyy7XWEkU2uoTdFxSp5gmwBinWrmqSjp87njtQtM1MZC87rbw",
+  "tether.multisafe.near": "ed25519:3kRos1kbsjmZnuxQ9UTRWXtMMrQxutwzJD5pTkHNyy7XWEkU2uoTdFxSp5gmwBinWrmqSjp87njtQtM1MZC87rbw",
+  "alice.near": "ed25519:3kRos1kbsjmZnuxQ9UTRWXtMMrQxutwzJD5pTkHNyy7XWEkU2uoTdFxSp5gmwBinWrmqSjp87njtQtM1MZC87rbw",
+  "bob.near": "ed25519:3kRos1kbsjmZnuxQ9UTRWXtMMrQxutwzJD5pTkHNyy7XWEkU2uoTdFxSp5gmwBinWrmqSjp87njtQtM1MZC87rbw"
 }

@@ -70,6 +70,10 @@ describe('Hackathon Demo', () => {
           { account_id: bob.accountId }
         ), "50000000", "Bob should have 50 USDT after transfer");
 
+        // // Wait for indexer to index latest transactions
+        console.log("Waiting for indexer to index latest transactions...");
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
         // assert QueryAPI has mint, transfer
         const query = `query MyQuery {
           dev_queryapi_test_near_usdt_transactions_usdt_transactions {
