@@ -14,6 +14,7 @@ impl<'a> Runner<'a> {
         network: &str,
         region: &str,
         hasura_address: &str,
+        hasura_password: &str,
         redis_address: &str,
         postgres_host: &str,
         postgres_port: u16,
@@ -27,7 +28,7 @@ impl<'a> Runner<'a> {
             .with_env_var("REGION", region)
             .with_env_var("REDIS_CONNECTION_STRING", redis_address)
             .with_env_var("HASURA_ENDPOINT", hasura_address)
-            .with_env_var("HASURA_ADMIN_SECRET", "myadminsecretkey")
+            .with_env_var("HASURA_ADMIN_SECRET", hasura_password)
             .with_env_var("PORT", Self::METRICS_PORT.to_string())
             .with_env_var("PGHOST", postgres_host)
             .with_env_var("PGPORT", postgres_port.to_string())

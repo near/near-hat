@@ -1,6 +1,6 @@
-import { connect, Contract, keyStores, KeyPair } from 'near-api-js';
-import { readFileSync } from 'fs';
-import {restoreTestAccountKeys, getOrCreateAccount} from './testUtils.js'
+import { connect, Contract, keyStores, utils } from 'near-api-js';
+import { restoreTestAccountKeys, getOrCreateAccount, registerIndexer, fetchGraphQL } from './testUtils.js'
+import assert from 'assert';
 
 describe('Hackathon Demo', () => {
     const connectionConfig = {
@@ -12,47 +12,78 @@ describe('Hackathon Demo', () => {
 
     test('Transaction events queryable after successful contract executions', async () => {
         const near = await connect(connectionConfig);
-        const privateKeys = restoreTestAccountKeys(near);
-
-        const queryApiAccount = await near.account("dev-queryapi.test.near");
-        const indexerRegistry = new Contract(queryApiAccount, 'dev-queryapi.test.near', {
-          viewMethods: ['read_indexer_function'],
-          changeMethods: ['register_indexer_function'],
-        });
-        const code = readFileSync('data/indexer_code.js').toString();
-        const schema = readFileSync('data/indexer_schema.sql').toString();
-        await indexerRegistry.account.functionCall({
-            contractId: indexerRegistry.contractId,
-            methodName: 'register_indexer_function',
-            args: {
-                "function_name": "test_indexer",
-                "code": code,
-                "schema": schema,
-                "filter_json": "{\"indexer_rule_kind\":\"Action\",\"matching_rule\":{\"rule\":\"ACTION_ANY\",\"affected_account_id\":\"*.near\",\"status\":\"SUCCESS\"}}"
-            },
-        });
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        const multisafe = await getOrCreateAccount(near, "multisafe.near", 2);
-        const usdtOwner = await getOrCreateAccount(near, "tether.multisafe.near", 1);
-        const alice = await getOrCreateAccount(near, "alice.near", 1);
-        const bob = await getOrCreateAccount(near, "bob.near", 1);
+        restoreTestAccountKeys(near);
         
-        const usdtContract = new Contract(usdtOwner, 'usdt.tether-token.near', {
-          viewMethods: ['ft_balance_of', 'owner'],
-          changeMethods: ['ft_transfer', 'mint', 'storage_deposit'],
+        await registerIndexer("usdt_transactions", 'data/indexer_code.js', 'data/indexer_schema.sql', "*.near", near);
+
+        const multisafe = await getOrCreateAccount(near, "multisafe.near", 20);
+        const usdtOwner = await getOrCreateAccount(near, "tether.multisafe.near", 5);
+        const alice = await getOrCreateAccount(near, "alice.near", 2);
+        const bob = await getOrCreateAccount(near, "bob.near", 2);
+        
+        const adminUsdtContractSigner = new Contract(usdtOwner, 'usdt.tether-token.near', {
+          viewMethods: ['ft_balance_of'],
+          changeMethods: ['mint', 'storage_deposit'],
         });
-        await usdtContract.storage_deposit({
-          account_id: alice.accountId
-        }, "300000000000000", "10000000000000000000000");
-        const response = await usdtContract.mint({
+
+        // Cover storage deposit
+        await adminUsdtContractSigner.storage_deposit({
+          args: { "account_id": alice.accountId },
+          gas: "300000000000000",
+          amount: "10000000000000000000000"
+        });
+        await adminUsdtContractSigner.storage_deposit({
+          args: { "account_id": bob.accountId },
+          gas: "300000000000000",
+          amount: "10000000000000000000000"
+        });
+
+        // Mint 100 USDT to Alice
+        const response = await adminUsdtContractSigner.mint({
             account_id: alice.accountId,
             amount: "100000000"
         });
-        // assert usdtContract.ft_balance_of({account_id: alice.accountId}).eq("100000000")
-        // assert QueryAPI
-        console.log(response);
+        assert.strictEqual(
+          await adminUsdtContractSigner.ft_balance_of(
+            { account_id: alice.accountId }
+          ),"100000000", "Alice should have 100 USDT to start");
+
+        // Transfer 50 USDT from Alice to Bob
+        const aliceUsdtContractSigner = new Contract(alice, 'usdt.tether-token.near', {
+          viewMethods: [],
+          changeMethods: ['ft_transfer', 'storage_deposit'],
+        });
+        await aliceUsdtContractSigner.ft_transfer(
+          {
+            receiver_id: bob.accountId,
+            amount: "50000000"
+          }, 
+          "300000000000000",
+          "1"
+        );
+
+        // Verify Alice and Bob both have 50 USDT
+        assert.strictEqual(await adminUsdtContractSigner.ft_balance_of(
+          { account_id: alice.accountId }
+        ), "50000000", "Alice should have 50 USDT after transfer");
+        assert.strictEqual(await adminUsdtContractSigner.ft_balance_of(
+          { account_id: bob.accountId }
+        ), "50000000", "Bob should have 50 USDT after transfer");
+
+        // assert QueryAPI has mint, transfer
+        const query = `query MyQuery {
+          dev_queryapi_test_near_usdt_transactions_usdt_transactions {
+            event
+          }
+        }`;
+        const result = await fetchGraphQL(query, {});
+        const events = result.data.dev_queryapi_test_near_usdt_transactions_usdt_transactions;
+        const hasFtMint = events.some(e => e.event === 'ft_mint');
+        assert(hasFtMint, "'ft_mint' event not found");
+
+        // Check if 'ft_transfer' is present
+        const hasFtTransfer = events.some(e => e.event === 'ft_transfer');
+        assert(hasFtTransfer, "'ft_transfer' event not found");
     }, 30000);
 });
 

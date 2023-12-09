@@ -2667,6 +2667,9 @@ dependencies = [
  "near-hat",
  "near-primitives",
  "near-workspaces",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2920,7 +2923,7 @@ dependencies = [
 [[package]]
 name = "near-workspaces"
 version = "0.9.0"
-source = "git+https://github.com/near/near-workspaces-rs.git?branch=daniyar/ignore-status#ed569d1c7207ed5c23a324ccc63918d31622a895"
+source = "git+https://github.com/near/near-workspaces-rs.git?rev=142893b6e501c5b638b20582d81482e173d4499d#142893b6e501c5b638b20582d81482e173d4499d"
 dependencies = [
  "async-trait",
  "base64 0.21.5",

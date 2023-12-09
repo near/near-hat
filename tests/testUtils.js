@@ -1,5 +1,28 @@
 import { KeyPair, utils } from 'near-api-js';
 import { readFileSync, writeFileSync } from 'fs';
+import { Contract } from 'near-api-js';
+
+export async function registerIndexer(indexerName, codePath, schemaPath, affectedAccountId, near) {
+    const queryApiAccount = await near.account("dev-queryapi.test.near");
+    const indexerRegistry = new Contract(queryApiAccount, 'dev-queryapi.test.near', {
+        viewMethods: [],
+        changeMethods: ['register_indexer_function'],
+    });
+    const code = readFileSync(codePath).toString();
+    const schema = readFileSync(schemaPath).toString();
+
+    await indexerRegistry.account.functionCall({
+        contractId: indexerRegistry.contractId,
+        methodName: "register_indexer_function",
+        args: {
+            "function_name": indexerName,
+            "code": code,
+            "schema": schema,
+            "filter_json": `{\"indexer_rule_kind\":\"Action\",\"matching_rule\":{\"rule\":\"ACTION_ANY\",\"affected_account_id\":\"${affectedAccountId}\",\"status\":\"SUCCESS\"}}`
+        },
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+}
 
 export function loadTestAccountKeys() {
     const privateKeysJson = readFileSync("data/keys.json", 'utf8');
@@ -45,7 +68,7 @@ export async function fetchGraphQL(query, variables) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-hasura-admin-secret': 'myadminsecretkey' // or use an appropriate auth token
+        'x-hasura-admin-secret': 'nearhat'
       },
       body: JSON.stringify({
         query,

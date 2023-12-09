@@ -60,19 +60,10 @@ impl<'a> QueryApiCtx<'a> {
             network, 
             s3_region, 
             &hasura_graphql.hasura_address, 
+            hasura_graphql.hasura_password().as_str(),
             redis_address, 
             &postgres.postgres_host, 
             postgres.postgres_port).await?;
-
-
-        // Create generic indexer and register it
-        // let register_function_args = serde_json::json!({
-        //     "function_name": "test_sweat_blockheight",
-        //     "code": "\n  const h = block.header().height;\n  await context.db.IndexerStorage.upsert({function_name: 'darunrs.near/test_sweat_blockheight', key_name: 'height', value: h.toString()}, [\"function_name\", \"key_name\"], [\"value\"]);\n",
-        //     "schema": "CREATE TABLE\n  \"indexer_storage\" (\n    \"function_name\" TEXT NOT NULL,\n    \"key_name\" TEXT NOT NULL,\n    \"value\" TEXT NOT NULL,\n    PRIMARY KEY (\"function_name\", \"key_name\")\n  )\n",
-        //     "filter_json": "{\"indexer_rule_kind\":\"Action\",\"matching_rule\":{\"rule\":\"ACTION_ANY\",\"affected_account_id\":\"*.near\",\"status\":\"SUCCESS\"}}"
-        //   });
-        // registry_holder.call(registry_holder.id(), "register_indexer_function").args(serde_json::to_vec(&register_function_args).unwrap()).transact().await?;
 
         Ok(QueryApiCtx { 
             hasura_auth,

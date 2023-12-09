@@ -1,5 +1,5 @@
 CREATE TABLE
-  indexers (
+  usdt_transactions (
     id SERIAL PRIMARY KEY,
     event VARCHAR(255) NOT NULL,
     amount VARCHAR(255) NOT NULL,
