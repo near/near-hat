@@ -1,3 +1,6 @@
 /target
-*.DS_STORE
-/hasura/config.yaml
+node_modules
+.DS_Store
+hasura/config.yaml
+package-lock.json
+keys.json

@@ -1,9 +1,13 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use crate::client::DockerClient;
 use crate::containers::lake_indexer::LakeIndexer;
 use crate::containers::localstack::LocalStack;
 use crate::validator::ValidatorContainer;
 use near_workspaces::network::{Sandbox, ValidatorKey};
 use near_workspaces::Worker;
+use serde_json::{json, Value};
 
 pub struct LakeIndexerCtx<'a> {
     pub localstack: LocalStack<'a>,
@@ -16,6 +20,7 @@ impl<'a> LakeIndexerCtx<'a> {
     pub async fn new(
         docker_client: &'a DockerClient,
         network: &str,
+        key_json_ref: Rc<RefCell<Value>>,
     ) -> anyhow::Result<LakeIndexerCtx<'a>> {
         let s3_bucket = "localnet".to_string();
         let s3_region = "us-east-1".to_string();
@@ -42,10 +47,12 @@ impl<'a> LakeIndexerCtx<'a> {
             ))
             .await?;
 
+        key_json_ref.borrow_mut()[validator_key.account_id.to_string()] = json!(validator_key.secret_key.to_string());
+
         Ok(LakeIndexerCtx {
             localstack,
             lake_indexer,
-            worker,
+            worker
         })
     }
 }
