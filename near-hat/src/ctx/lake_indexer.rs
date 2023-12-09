@@ -1,6 +1,4 @@
 use std::cell::RefCell;
-use std::fs::File;
-use std::io::Write;
 use std::rc::Rc;
 
 use crate::client::DockerClient;

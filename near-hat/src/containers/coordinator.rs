@@ -1,5 +1,4 @@
 use crate::DockerClient;
-use testcontainers::core::WaitFor;
 use testcontainers::{Container, GenericImage, RunnableImage};
 
 pub struct Coordinator<'a> {

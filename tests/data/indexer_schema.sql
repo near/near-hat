@@ -1,9 +1,9 @@
 CREATE TABLE
   indexers (
     id SERIAL PRIMARY KEY,
-    functionName VARCHAR(255) NOT NULL,
-    accountId VARCHAR(255) NOT NULL,
-    methodName VARCHAR(255) NOT NULL,
-    signerId VARCHAR(255) NOT NULL,
+    event VARCHAR(255) NOT NULL,
+    amount VARCHAR(255) NOT NULL,
+    from_account VARCHAR(255),
+    to_account VARCHAR(255),
     block_height INT
   );

@@ -127,12 +127,17 @@ async fn main() -> anyhow::Result<()> {
                     .host_postgres_address_ipv4()
             );
             println!(
-                "  Graphql Playground: http://playground.nearhat ({})",
+                "  Graphql Playground: http://playground.nearhat ({}), password: {}",
                 near_hat
                     .nearhat
                     .queryapi_ctx
                     .hasura_graphql
-                    .host_address_ipv4()
+                    .host_address_ipv4(),
+                near_hat
+                    .nearhat
+                    .queryapi_ctx
+                    .hasura_graphql
+                    .hasura_password()
             );
             println!(
                 "  Explorer Database: {}",

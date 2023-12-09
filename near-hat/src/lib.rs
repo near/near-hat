@@ -11,7 +11,7 @@ use ctx::nearcore::NearcoreCtx;
 use ctx::queryapi::QueryApiCtx;
 use ctx::relayer::RelayerCtx;
 use serde_json::Value;
-use std::{process::{Command, Child}, fs::File, rc::Rc, cell::RefCell};
+use std::{process::{Command, Child}, rc::Rc, cell::RefCell};
 
 
 pub struct NearHat<'a> {

@@ -2,7 +2,7 @@ use std::env;
 
 use crate::validator::ValidatorContainer;
 use crate::DockerClient;
-use testcontainers::{Container, GenericImage, RunnableImage, Image};
+use testcontainers::{Container, GenericImage, RunnableImage};
 
 pub struct HasuraGraphql<'a> {
     pub container: Container<'a, GenericImage>,
@@ -11,7 +11,7 @@ pub struct HasuraGraphql<'a> {
 
 impl<'a> HasuraGraphql<'a> {
     pub const CONTAINER_HASURA_GRAPHQL_PORT: u16 = 8080;
-    pub const HASURA_GRAPHQL_ADMIN_SECRET: &str = "myadminsecretkey";
+    pub const HASURA_GRAPHQL_ADMIN_SECRET: &'static str = "nearhat";
 
     pub async fn run(
         docker_client: &'a DockerClient,
@@ -65,6 +65,10 @@ impl<'a> HasuraGraphql<'a> {
     pub fn host_address_ipv6(&self) -> String {
         let host_port = self.container.get_host_port_ipv6(Self::CONTAINER_HASURA_GRAPHQL_PORT);
         format!("http://[::1]:{host_port}")
+    }
+
+    pub fn hasura_password(&self) -> String {
+        Self::HASURA_GRAPHQL_ADMIN_SECRET.to_string()
     }
 }
 

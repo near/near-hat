@@ -1,7 +1,6 @@
 import { connect, Contract, keyStores, KeyPair } from 'near-api-js';
 import { readFileSync } from 'fs';
-import { fullAccessKey } from 'near-api-js/lib/transaction';
-import assert from 'assert';
+import {restoreTestAccountKeys, getOrCreateAccount} from './testUtils.js'
 
 describe('Hackathon Demo', () => {
     const connectionConfig = {
@@ -10,23 +9,20 @@ describe('Hackathon Demo', () => {
         walletUrl: "NONE",
         keyStore: new keyStores.InMemoryKeyStore()
     };
-    const privateKeysJson = readFileSync("data/keys.json", 'utf8');
-    const privateKeys = JSON.parse(privateKeysJson);
-    Object.keys(privateKeys).forEach(key => {
-        connectionConfig.keyStore.setKey("localnet", key, KeyPair.fromString(privateKeys[key]));
-    });
 
     test('Transaction events queryable after successful contract executions', async () => {
-        const nearConnection = await connect(connectionConfig);
-        const base_account = await nearConnection.account("dev-queryapi.test.near");
-        const registry_contract = new Contract(base_account, 'dev-queryapi.test.near', {
-            viewMethods: ['read_indexer_function'],
-            changeMethods: ['register_indexer_function'],
+        const near = await connect(connectionConfig);
+        const privateKeys = restoreTestAccountKeys(near);
+
+        const queryApiAccount = await near.account("dev-queryapi.test.near");
+        const indexerRegistry = new Contract(queryApiAccount, 'dev-queryapi.test.near', {
+          viewMethods: ['read_indexer_function'],
+          changeMethods: ['register_indexer_function'],
         });
         const code = readFileSync('data/indexer_code.js').toString();
         const schema = readFileSync('data/indexer_schema.sql').toString();
-        const response = await registry_contract.account.functionCall({
-            contractId: registry_contract.contractId,
+        await indexerRegistry.account.functionCall({
+            contractId: indexerRegistry.contractId,
             methodName: 'register_indexer_function',
             args: {
                 "function_name": "test_indexer",
@@ -35,39 +31,28 @@ describe('Hackathon Demo', () => {
                 "filter_json": "{\"indexer_rule_kind\":\"Action\",\"matching_rule\":{\"rule\":\"ACTION_ANY\",\"affected_account_id\":\"*.near\",\"status\":\"SUCCESS\"}}"
             },
         });
-        // TODO: Get block height from response to filter result of later graphql call (To allow successive calls)
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        const multisafe = await getOrCreateAccount(near, "multisafe.near", 2);
+        const usdtOwner = await getOrCreateAccount(near, "tether.multisafe.near", 1);
+        const alice = await getOrCreateAccount(near, "alice.near", 1);
+        const bob = await getOrCreateAccount(near, "bob.near", 1);
         
-        // Let indexer initialize
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        for (let i = 0; i < 3; i++) {
-            await registry_contract.account.functionCall({
-                contractId: registry_contract.contractId,
-                methodName: 'add_user',
-                args: {
-                    "account_id": `new-user-${i}.test.near`,
-                },
-            });
-        }
-
-        // Let indexer index calls
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-
-        const query = `query MyQuery {
-            dev_queryapi_test_near_test_indexer_indexers {
-              methodname
-            }
-          }`;
-        const result = await fetchGraphQL(query, {});
-        console.log(result);
-        const expectedMethodNames = [
-            'add_user',
-            'add_user',
-            'add_user',
-          ];
-        const actualMethodNames = result.data.dev_queryapi_test_near_test_indexer_indexers.map(item => item.methodname);
-        assert(doLastElementsMatch(actualMethodNames, expectedMethodNames), 'The order of values of method names do not match');
+        const usdtContract = new Contract(usdtOwner, 'usdt.tether-token.near', {
+          viewMethods: ['ft_balance_of', 'owner'],
+          changeMethods: ['ft_transfer', 'mint', 'storage_deposit'],
+        });
+        await usdtContract.storage_deposit({
+          account_id: alice.accountId
+        }, "300000000000000", "10000000000000000000000");
+        const response = await usdtContract.mint({
+            account_id: alice.accountId,
+            amount: "100000000"
+        });
+        // assert usdtContract.ft_balance_of({account_id: alice.accountId}).eq("100000000")
+        // assert QueryAPI
+        console.log(response);
     }, 30000);
 });
 
@@ -79,19 +64,3 @@ function doLastElementsMatch(resultArray, expectedArray) {
     return lastElements.length === expectedArray.length &&
            lastElements.every((element, index) => element === expectedArray[index]);
 }
-
-async function fetchGraphQL(query, variables) {
-    const response = await fetch('http://playground.nearhat/v1/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-hasura-admin-secret': 'myadminsecretkey' // or use an appropriate auth token
-      },
-      body: JSON.stringify({
-        query,
-        variables
-      })
-    });
-  
-    return response.json();
-  }

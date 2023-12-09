@@ -11,8 +11,8 @@ pub struct QueryApiPostgres<'a> {
 
 impl<'a> QueryApiPostgres<'a> {
     const POSTGRES_PORT: u16 = 5432;
-    const POSTGRES_USERNAME: &str = "postgres";
-    const POSTGRES_PASSWORD: &str = "postgres";
+    const POSTGRES_USERNAME: &'static str = "postgres";
+    const POSTGRES_PASSWORD: &'static str = "postgres";
 
 
     pub async fn run(
