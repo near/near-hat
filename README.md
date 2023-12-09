@@ -4,6 +4,8 @@ NEARHat is a NEAR Protocol local development environment.
 It allows you to run local development of dApps and create
 automated end-to-end tests from smart contracts to indexers.
 
+![NEARHat-Logo](https://github.com/near/near-hat/assets/116191277/68326fa2-f9d9-45b4-a332-078b4733d376)
+
 Built by the Pagoda Engineers for the NEAR Ecosystem as part of the December 2023 hackathon.
 
 Currently supports local versions of:
