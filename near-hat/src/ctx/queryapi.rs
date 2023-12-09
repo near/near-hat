@@ -1,11 +1,12 @@
-use near_crypto::KeyFile;
+use std::cell::RefCell;
 use std::fs;
 use std::path::Path;
 use std::fs::File;
 use std::io::Write;
+use std::rc::Rc;
 
 use near_token::NearToken;
-use serde_json::json;
+use serde_json::{json, Value};
 
 use crate::client::DockerClient;
 use crate::containers::coordinator::Coordinator;
@@ -34,22 +35,14 @@ impl<'a> QueryApiCtx<'a> {
         s3_region: &str,
         nearcore: &NearcoreCtx,
         rpc_address: &str,
-        validator_key: &KeyFile,
+        key_json_ref: Rc<RefCell<Value>>,
     ) -> anyhow::Result<QueryApiCtx<'a>> {
         // Deploy registry contract and initialize it
         let wasm_bytes = fs::read("wasm/registry.wasm")?;
         let registry_holder = nearcore.create_account("dev-queryapi", NearToken::from_near(50)).await?;
         let registry_contract = registry_holder.deploy(&wasm_bytes).await?.unwrap();
 
-        // Write validator and queryapi account keys to file for use
-        let keys = json!({
-            validator_key.account_id.clone(): validator_key.secret_key,
-            registry_holder.id().to_owned(): registry_holder.secret_key()
-        });
-        
-        let keys_path = Path::new("./tests/data/keys.json");
-        let mut file = File::create(&keys_path).expect("Unable to create file to store private keys");
-        writeln!(file, "{}", keys.to_string()).expect("Unable to write private keys to file");
+        key_json_ref.borrow_mut()[registry_holder.id().to_string()] = json!(registry_holder.secret_key().to_string());
 
         // Set up dockers
         let hasura_auth = HasuraAuth::run(docker_client, network).await?;

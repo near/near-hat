@@ -1,10 +1,20 @@
+use std::cell::RefCell;
+use std::fs::File;
+use std::io::Write;
+use std::rc::Rc;
+use std::str::FromStr;
+use std::sync::{Arc, Mutex};
+
 use clap::Parser;
 use near_hat::{DockerClient, NearHat};
+use near_primitives::account::AccessKey;
 use near_primitives::types::AccountId;
-use near_workspaces::network::Sandbox;
-use near_workspaces::Worker;
+use near_workspaces::types::{PublicKey, KeyType};
+use near_workspaces::{network::Sandbox, types::SecretKey};
+use near_workspaces::{Worker, Contract};
 use tokio::io::{stdin, AsyncReadExt};
 use tracing_subscriber::EnvFilter;
+use serde_json::{json, Value};
 extern crate ctrlc;
 
 #[derive(Parser, Debug)]
@@ -16,7 +26,17 @@ pub enum Cli {
     },
 }
 
-async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId]) -> anyhow::Result<()> {
+async fn patch_existing_account(worker: &Worker<Sandbox>, account_id: &AccountId, key_json_ref: Rc<RefCell<Value>>) -> anyhow::Result<()> {
+    let _span = tracing::info_span!("creating account");
+    let secret_key = near_workspaces::types::SecretKey::from_random(KeyType::ED25519);
+    worker.patch(account_id).access_key(secret_key.public_key(), near_workspaces::AccessKey::full_access()).transact().await?;
+    key_json_ref.borrow_mut()[account_id.to_string()] = json!(secret_key.to_string());
+    tracing::info!(%account_id, "patched account");
+    Ok(())
+}
+
+async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId], key_json_ref: Rc<RefCell<Value>>) -> anyhow::Result<()> {
+    patch_existing_account(worker, &AccountId::from_str("near").unwrap(), key_json_ref.clone()).await?;
     let _span = tracing::info_span!("spooning contracts");
     let readrpc_worker = near_workspaces::mainnet()
         .rpc_addr("https://beta.rpc.mainnet.near.org")
@@ -27,7 +47,7 @@ async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId]) -> a
             .transact()
             .await?;
         tracing::info!(%contract, "imported contract");
-        let state: Vec<u8> = readrpc_worker
+        let state = readrpc_worker
             .view_state(contract)
             .finality(near_workspaces::types::Finality::Final)
             .prefix(b"STATE".as_slice())
@@ -35,9 +55,11 @@ async fn spoon_contracts(worker: &Worker<Sandbox>, contracts: &[AccountId]) -> a
             .remove(b"STATE".as_slice())
             .unwrap();
         tracing::info!(%contract, state_size = state.len(), "pulled contract state");
-        worker.patch_state(contract, b"STATE", &state).await?;
         tracing::info!(%contract, "patched contract state");
+        worker.patch_state(contract, b"STATE", &state).await?;
+        patch_existing_account(worker, contract, key_json_ref.clone()).await?;
     }
+    
     Ok(())
 }
 
@@ -51,13 +73,20 @@ async fn main() -> anyhow::Result<()> {
 
     match Cli::parse() {
         Cli::Start { contracts_to_spoon } => {
+            let key_json_ref = Rc::new(RefCell::new(json!({})));
             let docker_client = DockerClient::default();
-            let mut near_hat = NearHat::new(&docker_client, "nearhat").await?;
+            let mut near_hat = NearHat::new(&docker_client, "nearhat", key_json_ref.clone()).await?;
             spoon_contracts(
                 &near_hat.nearhat.lake_indexer_ctx.worker,
                 &contracts_to_spoon,
+                key_json_ref.clone()
             )
             .await?;
+
+            let key_file_path = "tests/data/keys.json";
+            let key_file = &mut File::create(key_file_path)?;
+            let json_str = serde_json::to_string(&*key_json_ref.borrow())?;
+            key_file.write_all(json_str.as_bytes())?;
 
             println!("\nNEARHat environment is ready:");
             println!(

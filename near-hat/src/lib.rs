@@ -10,7 +10,8 @@ use ctx::lake_indexer::LakeIndexerCtx;
 use ctx::nearcore::NearcoreCtx;
 use ctx::queryapi::QueryApiCtx;
 use ctx::relayer::RelayerCtx;
-use std::process::{Command, Child};
+use serde_json::Value;
+use std::{process::{Command, Child}, fs::File, rc::Rc, cell::RefCell};
 
 
 pub struct NearHat<'a> {
@@ -30,8 +31,9 @@ impl<'a> NearHat<'a> {
     pub async fn new(
         docker_client: &'a DockerClient,
         network: &str,
+        key_json_ref: Rc<RefCell<Value>>,
     ) -> anyhow::Result<NearHatEnvironment<'a>> {
-        let lake_indexer_ctx = LakeIndexerCtx::new(&docker_client, network).await?;
+        let lake_indexer_ctx = LakeIndexerCtx::new(&docker_client, network, key_json_ref.clone()).await?;
         let nearcore_ctx = NearcoreCtx::new(&lake_indexer_ctx.worker).await?;
         let relayer_ctx = RelayerCtx::new(docker_client, network, &nearcore_ctx).await?;
         let queryapi_ctx = QueryApiCtx::new(
@@ -43,7 +45,7 @@ impl<'a> NearHat<'a> {
             &lake_indexer_ctx.localstack.s3_region,
             &nearcore_ctx,
             &lake_indexer_ctx.lake_indexer.rpc_address,
-            &lake_indexer_ctx.validator_key,
+            key_json_ref.clone(),
         )
         .await?;
         let explorer_ctx = ExplorerCtx::new(docker_client, network, &lake_indexer_ctx).await?;
